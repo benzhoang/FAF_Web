@@ -1,15 +1,67 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import FAFLogo from '../assets/FAF-Logo.png';
+import Loading from '../components/Loading';
 
 const Signin = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    // Tài khoản giả
+    const fakeAccounts = {
+        worker: {
+            email: 'worker@faf.com',
+            password: 'password123',
+            role: 'worker',
+            redirect: '/'
+        },
+        taskOwner: {
+            email: 'owner@faf.com',
+            password: 'password123',
+            role: 'taskOwner',
+            redirect: '/task-owner'
+        }
+    };
 
     const togglePasswordVisibility = () => {
         setShowPassword((prev) => !prev);
     };
 
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        setError('');
+
+        // Kiểm tra tài khoản
+        const account = Object.values(fakeAccounts).find(
+            acc => acc.email === email && acc.password === password
+        );
+
+        if (account) {
+            setLoading(true);
+            // Lưu thông tin đăng nhập vào localStorage (tùy chọn)
+            localStorage.setItem('user', JSON.stringify({
+                email: account.email,
+                role: account.role
+            }));
+
+            // Giả lập thời gian loading trước khi điều hướng
+            setTimeout(() => {
+                // Điều hướng theo role
+                navigate(account.redirect);
+                setLoading(false);
+            }, 1000);
+        } else {
+            setError('Email hoặc mật khẩu không đúng. Vui lòng thử lại.');
+        }
+    };
+
     return (
-        <div className="min-h-screen auth-gradient flex flex-col">
+        <div className="min-h-screen auth-gradient flex flex-col relative">
+            {loading && <Loading />}
             <header className="flex items-center justify-between px-8 py-6 text-sm text-gray-600">
                 <div className="flex items-center">
                     <img src={FAFLogo} alt="FAF logo" className="h-12 w-auto object-contain" />
@@ -22,14 +74,20 @@ const Signin = () => {
                 </div>
             </header>
 
-            <div className="flex-1 flex items-center justify-center px-4 pb-12">
+            <div className={`flex-1 flex items-center justify-center px-4 pb-12 ${loading ? 'pointer-events-none opacity-60' : ''}`}>
                 <div className="w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-gray-100 px-10 py-12">
                     <div className="space-y-2 mb-8">
                         <h1 className="text-2xl font-bold text-gray-900">Welcome Back</h1>
                         <p className="text-sm text-gray-500">Enter your details to access your candidate dashboard.</p>
                     </div>
 
-                    <form className="space-y-5">
+                    <form className="space-y-5" onSubmit={handleSubmit}>
+                        {error && (
+                            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                                {error}
+                            </div>
+                        )}
+
                         <div className="space-y-2">
                             <label htmlFor="email" className="text-sm font-semibold text-gray-700">
                                 Email address
@@ -39,7 +97,10 @@ const Signin = () => {
                                     id="email"
                                     type="email"
                                     placeholder="name@company.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    required
                                 />
                                 <svg
                                     className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
@@ -62,7 +123,10 @@ const Signin = () => {
                                     id="password"
                                     type={showPassword ? 'text' : 'password'}
                                     placeholder="•••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                                    required
                                 />
                                 <button
                                     type="button"
@@ -126,16 +190,18 @@ const Signin = () => {
                         </button>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-                        <a
-                            href="/"
-                            className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                            </svg>
-                            Back to Home
-                        </a>
+                    <div className="mt-6 pt-4 border-t border-gray-100">
+                        <div className="text-center">
+                            <a
+                                href="/"
+                                className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800"
+                            >
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                </svg>
+                                Back to Home
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

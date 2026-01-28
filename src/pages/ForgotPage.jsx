@@ -7,8 +7,8 @@ const ForgotPage = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Điều hướng sang trang đặt lại mật khẩu sau khi nhập email
-        navigate('/reset-password');
+        // Điều hướng sang trang nhập OTP sau khi nhập email
+        navigate('/forgot-otp');
     };
 
     return (
