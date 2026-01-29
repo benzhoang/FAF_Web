@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PostingProgress from './PostingProgress';
-import Step1SelectType from './Step1SelectType';
-import Step2JobDetails from './Step2JobDetails';
-import Step3BudgetMilestones from './Step3BudgetMilestones';
-import Step4Contract from './Step4Contract';
-import Step5ReviewPublish from './Step5ReviewPublish';
+import Step1SelectType from './Step1';
+import Step2JobDetails from './Step2';
+import Step3BudgetMilestones from './Step3';
+import Step4Contract from './Step4';
+import Step5ReviewPublish from './Step5';
 
 const Postjob = () => {
     const navigate = useNavigate();

@@ -4,6 +4,8 @@ import Footer from './components/Footer'
 import HomePage from './pages/Worker/HomePage'
 import FindWork from './pages/Worker/FindWork'
 import WorkDetail from './pages/Worker/WorkDetail'
+import WorkerDashboard from './pages/Worker/WorkerDashboard'
+import Settings from './pages/Worker/Settings'
 import TaskOwnerPage from './pages/TaskOwner/TaskOwnerPage'
 import Postjob from './pages/TaskOwner/PostJob/Postjob'
 import Signin from './pages/Signin'
@@ -57,6 +59,30 @@ function App() {
             <Navbar />
             <main className="flex-grow w-full">
               <WorkDetail />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+      <Route
+        path="/dashboard"
+        element={
+          <div className="w-full min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow w-full">
+              <WorkerDashboard />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <div className="w-full min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow w-full">
+              <Settings />
             </main>
             <Footer />
           </div>
