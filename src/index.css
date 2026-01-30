@@ -25,3 +25,63 @@ body {
         #d8ecff 100%);
   }
 }
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* --- Tiptap (Contract editor) minimal content styling --- */
+.tiptap-content h2 {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.tiptap-content h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+
+.tiptap-content p {
+  margin: 0 0 10px;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  padding-left: 1.25rem;
+  margin: 0 0 10px;
+}
+
+.tiptap-content ul {
+  list-style: disc;
+}
+
+.tiptap-content ol {
+  list-style: decimal;
+}
+
+.tiptap-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.tiptap-content img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 1);
+  margin: 10px 0;
+}

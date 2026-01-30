@@ -6,6 +6,9 @@ import FindWork from './pages/Worker/FindWork'
 import WorkDetail from './pages/Worker/WorkDetail'
 import WorkerDashboard from './pages/Worker/WorkerDashboard'
 import Settings from './pages/Worker/Settings'
+import Wallet from './pages/Worker/Wallet'
+import Depositpoint from './pages/Worker/Depositpoint'
+import Withdrawpoint from './pages/Worker/Withdrawpoint'
 import TaskOwnerPage from './pages/TaskOwner/TaskOwnerPage'
 import Postjob from './pages/TaskOwner/PostJob/Postjob'
 import Signin from './pages/Signin'
@@ -83,6 +86,42 @@ function App() {
             <Navbar />
             <main className="flex-grow w-full">
               <Settings />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+      <Route
+        path="/wallet"
+        element={
+          <div className="w-full min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow w-full">
+              <Wallet />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+      <Route
+        path="/deposit-points"
+        element={
+          <div className="w-full min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow w-full">
+              <Depositpoint />
+            </main>
+            <Footer />
+          </div>
+        }
+      />
+      <Route
+        path="/withdraw-points"
+        element={
+          <div className="w-full min-h-screen flex flex-col">
+            <Navbar />
+            <main className="flex-grow w-full">
+              <Withdrawpoint />
             </main>
             <Footer />
           </div>
