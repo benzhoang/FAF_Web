@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import FAFLogo from '../assets/FAF-Logo.png';
+import { userApi } from '../api/user.api';
 
 const Navbar = () => {
     const [user, setUser] = useState(null);
@@ -10,10 +11,15 @@ const Navbar = () => {
 
     useEffect(() => {
         // Kiểm tra user từ localStorage
-        const userData = localStorage.getItem('user');
-        if (userData) {
-            setUser(JSON.parse(userData));
-        }
+        userApi.getMe()
+            .then(response => {
+                setUser(response);
+                console.log(response)
+            }
+            )
+            .catch(() => {
+                setUser(null);
+            });
     }, []);
 
     // Đóng dropdown khi click ra ngoài

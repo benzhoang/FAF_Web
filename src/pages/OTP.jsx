@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import FAFLogo from '../assets/FAF-Logo.png';
+import { authApi } from '../api/auth.api';
 
 const OTP = () => {
+    const location = useLocation();
+    const email = location.state?.email;
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const navigate = useNavigate();
 
@@ -48,17 +51,32 @@ const OTP = () => {
             return;
         }
 
-        // TODO: Gọi API xác thực OTP ở đây
+        authApi.verifyOTP({ otp: otpCode, email })
+            .then(response => {
+                console.log('OTP verification successful:', response);
+                alert('Xác thực OTP thành công!');
+                navigate('/signin');
+            })
+            .catch(error => {
+                console.error('OTP verification failed:', error);
+                alert('Xác thực OTP thất bại. Vui lòng thử lại.');
+            });
         console.log('OTP Code:', otpCode);
+        console.log('mail:', email);
         
-        // Sau khi xác thực thành công, chuyển đến trang đăng nhập hoặc trang chủ
-        // navigate('/signin');
-        alert('Xác thực OTP thành công!');
+        
     };
 
     const handleResend = () => {
-        // TODO: Gọi API gửi lại OTP
-        alert('Đã gửi lại mã OTP!');
+        authApi.reSendOtp({ email })
+            .then(response => {
+                console.log('Resend OTP successful:', response);
+                alert('Mã OTP đã được gửi lại đến email của bạn!');
+            })
+            .catch(error => {
+                console.error('Resend OTP failed:', error);
+                alert('Gửi lại mã OTP thất bại. Vui lòng thử lại.');
+            });
     };
 
     return (
