@@ -4,13 +4,19 @@ import Footer from "./components/Footer";
 import HomePage from "./pages/Worker/HomePage";
 import FindWork from "./pages/Worker/FindWork";
 import WorkDetail from "./pages/Worker/WorkDetail";
+import Apply from "./pages/Worker/Apply/Apply";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 import Settings from "./pages/Worker/Settings";
 import Wallet from "./pages/Worker/Wallet";
 import Depositpoint from "./pages/Worker/Depositpoint";
 import Withdrawpoint from "./pages/Worker/Withdrawpoint";
 import TaskOwnerPage from "./pages/TaskOwner/TaskOwnerPage";
+import ProfilesPage from "./pages/TaskOwner/ProfilesPage";
+import Contracts from "./pages/TaskOwner/Contracts";
+import Jobs from "./pages/TaskOwner/Jobs";
+import JobDetail from "./pages/TaskOwner/JobDetail";
 import Postjob from "./pages/TaskOwner/PostJob/Postjob";
+import Talents from "./pages/TaskOwner/Talents";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import OTP from "./pages/OTP";
@@ -72,6 +78,14 @@ function App() {
             </main>
             <Footer />
           </div>
+        }
+      />
+      <Route
+        path="/apply"
+        element={
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <Apply />
+          </ProtectedRoute>
         }
       />
       <Route
@@ -141,6 +155,46 @@ function App() {
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
             <TaskOwnerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/jobs"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <Jobs />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/jobs/:id"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <JobDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/contracts"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <Contracts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/profiles"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <ProfilesPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/talent"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <Talents />
           </ProtectedRoute>
         }
       />

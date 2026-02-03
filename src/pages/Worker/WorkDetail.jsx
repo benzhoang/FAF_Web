@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 
 // Mock data - trong thực tế sẽ lấy từ API hoặc state management
 const MOCK_JOB_DETAIL = {
@@ -48,6 +48,7 @@ const MOCK_JOB_DETAIL = {
 
 const WorkDetail = () => {
     const { id } = useParams()
+    const navigate = useNavigate()
     const job = MOCK_JOB_DETAIL // Trong thực tế sẽ fetch dựa trên id
 
     return (
@@ -137,7 +138,10 @@ const WorkDetail = () => {
                         {/* Sidebar */}
                         <aside className="lg:sticky lg:top-24 h-fit space-y-6">
                             {/* Apply Now Button */}
-                            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-4 px-6 rounded-xl transition-all shadow-lg">
+                            <button
+                                onClick={() => navigate('/apply')}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-extrabold py-4 px-6 rounded-xl transition-all shadow-lg"
+                            >
                                 Apply Now
                             </button>
 

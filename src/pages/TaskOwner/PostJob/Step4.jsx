@@ -13,6 +13,7 @@ const Step4Contract = ({
   setContractAccepted,
   onContinue,
   onBack,
+  hideFooter = false, // when true, hide checkbox + action buttons (for standalone Contracts page)
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDraftDirty, setIsDraftDirty] = useState(false);
@@ -584,42 +585,44 @@ const Step4Contract = ({
         </div>
 
         {/* Acceptance + actions */}
-        <div className="px-6 py-5 border-t border-gray-100">
-          <label className="flex items-start gap-3 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={contractAccepted}
-              onChange={(e) => setContractAccepted(e.target.checked)}
-              className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">
-              I have read and agree to the terms in this contract.
-            </span>
-          </label>
+        {!hideFooter && (
+          <div className="px-6 py-5 border-t border-gray-100">
+            <label className="flex items-start gap-3 cursor-pointer select-none">
+              <input
+                type="checkbox"
+                checked={contractAccepted}
+                onChange={(e) => setContractAccepted(e.target.checked)}
+                className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span className="text-sm text-gray-700">
+                I have read and agree to the terms in this contract.
+              </span>
+            </label>
 
-          <div className="flex flex-col sm:flex-row gap-3 mt-5">
-            <button
-              onClick={() => {
-                const finalContractHtml = contractHtml || defaultContractHtml;
-                onContinue(finalContractHtml);
-              }}
-              disabled={!contractAccepted}
-              className={`sm:order-2 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold shadow-md transition-colors ${
-                contractAccepted
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
-                  : "bg-gray-200 text-gray-500 cursor-not-allowed"
-              }`}
-            >
-              Continue
-            </button>
-            <button
-              onClick={onBack}
-              className="sm:order-1 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-            >
-              ← Back to Step 3
-            </button>
+            <div className="flex flex-col sm:flex-row gap-3 mt-5">
+              <button
+                onClick={() => {
+                  const finalContractHtml = contractHtml || defaultContractHtml;
+                  onContinue(finalContractHtml);
+                }}
+                disabled={!contractAccepted}
+                className={`sm:order-2 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold shadow-md transition-colors ${
+                  contractAccepted
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-gray-200 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                Continue
+              </button>
+              <button
+                onClick={onBack}
+                className="sm:order-1 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                ← Back to Step 3
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
