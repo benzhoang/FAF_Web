@@ -1,7 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Step1 = () => {
+const Step1 = ({ onNext }) => {
     const navigate = useNavigate()
     return (
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 px-6 sm:px-10 py-8">
@@ -82,7 +82,10 @@ const Step1 = () => {
 
                 {/* Actions */}
                 <div className="flex flex-col items-center gap-4">
-                    <button className="w-full sm:w-auto px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold shadow-md">
+                    <button 
+                        onClick={onNext}
+                        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold shadow-md"
+                    >
                         Continue to Milestones
                     </button>
                     <button

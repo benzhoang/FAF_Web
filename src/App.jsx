@@ -5,6 +5,7 @@ import HomePage from "./pages/Worker/HomePage";
 import FindWork from "./pages/Worker/FindWork";
 import WorkDetail from "./pages/Worker/WorkDetail";
 import Apply from "./pages/Worker/Apply/Apply";
+import Success from "./pages/Worker/Apply/Success";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 import Settings from "./pages/Worker/Settings";
 import Wallet from "./pages/Worker/Wallet";
@@ -85,6 +86,14 @@ function App() {
         element={
           <ProtectedRoute roles={["worker", "admin"]}>
             <Apply />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/apply/success"
+        element={
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <Success />
           </ProtectedRoute>
         }
       />
