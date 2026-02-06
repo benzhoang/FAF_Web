@@ -227,6 +227,38 @@ const Step4Contract = ({
       .join("");
   }, [defaultContractText]);
 
+  // Tách hợp đồng thành phần cố định (điều 1-5) và phần có thể chỉnh sửa
+  const { lockedHtml, editableHtml } = useMemo(() => {
+    const html = defaultContractHtml;
+    // Tìm vị trí bắt đầu của phần "ĐẠI DIỆN CÁC BÊN KÝ TÊN" - đây là điểm bắt đầu phần có thể chỉnh sửa
+    const signatureIndex = html.indexOf('<p><strong>ĐẠI DIỆN CÁC BÊN KÝ TÊN</strong></p>');
+    
+    if (signatureIndex !== -1) {
+      // Phần trước "ĐẠI DIỆN CÁC BÊN KÝ TÊN" là phần cố định (bao gồm điều 1-5)
+      const lockedHtml = html.substring(0, signatureIndex);
+      // Phần từ "ĐẠI DIỆN CÁC BÊN KÝ TÊN" trở đi là phần có thể chỉnh sửa
+      const editableHtml = html.substring(signatureIndex);
+      return { lockedHtml, editableHtml };
+    }
+    
+    // Fallback: nếu không tìm thấy, tìm vị trí sau điều 5/6
+    const endOfLockedPattern = selectedType === "short-term" 
+      ? /(<h3>Điều 5\. Hiệu lực hợp đồng<\/h3>[\s\S]*?<p><\/p>)/i
+      : /(<h3>Điều 6\. Hiệu lực hợp đồng<\/h3>[\s\S]*?<p><\/p>)/i;
+    
+    const match = html.match(endOfLockedPattern);
+    
+    if (match && match.index !== undefined) {
+      const endIndex = match.index + match[0].length;
+      const lockedHtml = html.substring(0, endIndex);
+      const editableHtml = html.substring(endIndex);
+      return { lockedHtml, editableHtml };
+    }
+    
+    // Fallback cuối cùng: toàn bộ là locked
+    return { lockedHtml: html, editableHtml: "" };
+  }, [defaultContractHtml, selectedType]);
+
   const isReady = !!contractInfo.clientEmail;
 
   const editor = useEditor({
@@ -249,6 +281,7 @@ const Step4Contract = ({
       },
     },
     onUpdate: ({ editor }) => {
+      // Chỉ lưu phần có thể chỉnh sửa (không bao gồm phần cố định)
       setContractHtml(editor.getHTML());
       setIsDraftDirty(true);
     },
@@ -258,8 +291,13 @@ const Step4Contract = ({
     if (!editor) return;
     if (isDraftDirty) return;
 
-    editor.commands.setContent(defaultContractHtml, false);
-  }, [editor, defaultContractHtml, isDraftDirty]);
+    // contractHtml chỉ chứa phần editable (từ editor.getHTML())
+    // Nếu đã có contractHtml (từ lần edit trước), dùng nó, nếu không thì dùng editableHtml mặc định
+    const contentToLoad = contractHtml || editableHtml;
+    
+    // Chỉ load phần có thể chỉnh sửa vào editor
+    editor.commands.setContent(contentToLoad, false);
+  }, [editor, editableHtml, isDraftDirty, contractHtml]);
 
   useEffect(() => {
     if (!editor) return;
@@ -290,9 +328,9 @@ const Step4Contract = ({
   };
 
   const resetToTemplate = () => {
-    setContractHtml(defaultContractHtml);
+    setContractHtml("");
     setIsDraftDirty(false);
-    if (editor) editor.commands.setContent(defaultContractHtml, false);
+    if (editor) editor.commands.setContent(editableHtml, false);
   };
 
   const toolbarBtnClass = (active, disabled = false) =>
@@ -572,12 +610,25 @@ const Step4Contract = ({
                 <div
                   className="tiptap-content text-[13px] leading-6 text-gray-900"
                   dangerouslySetInnerHTML={{
-                    __html: contractHtml || defaultContractHtml,
+                    __html: lockedHtml + (contractHtml || editableHtml),
                   }}
                 />
               ) : (
-                <div className="min-h-[60vh] rounded-lg border border-gray-200 bg-white p-4 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-600/20">
-                  <EditorContent editor={editor} />
+                <div className="tiptap-content text-[13px] leading-6 text-gray-900">
+                  {/* Phần cố định (Điều 1-5) - hiển thị nhưng không thể chỉnh sửa */}
+                  <div
+                    className="locked-content pointer-events-none select-none"
+                    style={{ userSelect: 'none' }}
+                    dangerouslySetInnerHTML={{
+                      __html: lockedHtml,
+                    }}
+                  />
+                  {/* Phần có thể chỉnh sửa - chỉ cho phép thêm vào */}
+                  <div className="editable-section mt-4">
+                    <div className="min-h-[40vh] rounded-lg border border-blue-300 bg-white p-4 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-600/20">
+                      <EditorContent editor={editor} />
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
@@ -602,7 +653,9 @@ const Step4Contract = ({
             <div className="flex flex-col sm:flex-row gap-3 mt-5">
               <button
                 onClick={() => {
-                  const finalContractHtml = contractHtml || defaultContractHtml;
+                  // Merge phần cố định + phần đã chỉnh sửa
+                  const finalEditableHtml = contractHtml || editableHtml;
+                  const finalContractHtml = lockedHtml + finalEditableHtml;
                   onContinue(finalContractHtml);
                 }}
                 disabled={!contractAccepted}

@@ -28,6 +28,8 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import "./App.css";
 import JobListPage from "./pages/TaskOwner/PostJob/JobListPage";
 import Dashboard from "./pages/Admin/Dashboard";
+import UserManage from "./pages/Admin/UserManage";
+import Moderation from "./pages/Admin/Moderation";
 
 function App() {
   return (
@@ -219,6 +221,22 @@ function App() {
         }
       />
 
+      <Route
+        path="/admin/user-management"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <UserManage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/moderation"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <Moderation />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/job-list" element={<JobListPage />} />
     </Routes>
