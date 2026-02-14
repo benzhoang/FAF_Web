@@ -232,7 +232,7 @@ const Step4Contract = ({
     const html = defaultContractHtml;
     // Tìm vị trí bắt đầu của phần "ĐẠI DIỆN CÁC BÊN KÝ TÊN" - đây là điểm bắt đầu phần có thể chỉnh sửa
     const signatureIndex = html.indexOf('<p><strong>ĐẠI DIỆN CÁC BÊN KÝ TÊN</strong></p>');
-    
+
     if (signatureIndex !== -1) {
       // Phần trước "ĐẠI DIỆN CÁC BÊN KÝ TÊN" là phần cố định (bao gồm điều 1-5)
       const lockedHtml = html.substring(0, signatureIndex);
@@ -240,21 +240,21 @@ const Step4Contract = ({
       const editableHtml = html.substring(signatureIndex);
       return { lockedHtml, editableHtml };
     }
-    
+
     // Fallback: nếu không tìm thấy, tìm vị trí sau điều 5/6
-    const endOfLockedPattern = selectedType === "short-term" 
+    const endOfLockedPattern = selectedType === "short-term"
       ? /(<h3>Điều 5\. Hiệu lực hợp đồng<\/h3>[\s\S]*?<p><\/p>)/i
       : /(<h3>Điều 6\. Hiệu lực hợp đồng<\/h3>[\s\S]*?<p><\/p>)/i;
-    
+
     const match = html.match(endOfLockedPattern);
-    
+
     if (match && match.index !== undefined) {
       const endIndex = match.index + match[0].length;
       const lockedHtml = html.substring(0, endIndex);
       const editableHtml = html.substring(endIndex);
       return { lockedHtml, editableHtml };
     }
-    
+
     // Fallback cuối cùng: toàn bộ là locked
     return { lockedHtml: html, editableHtml: "" };
   }, [defaultContractHtml, selectedType]);
@@ -294,7 +294,7 @@ const Step4Contract = ({
     // contractHtml chỉ chứa phần editable (từ editor.getHTML())
     // Nếu đã có contractHtml (từ lần edit trước), dùng nó, nếu không thì dùng editableHtml mặc định
     const contentToLoad = contractHtml || editableHtml;
-    
+
     // Chỉ load phần có thể chỉnh sửa vào editor
     editor.commands.setContent(contentToLoad, false);
   }, [editor, editableHtml, isDraftDirty, contractHtml]);
@@ -659,11 +659,10 @@ const Step4Contract = ({
                   onContinue(finalContractHtml);
                 }}
                 disabled={!contractAccepted}
-                className={`sm:order-2 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold shadow-md transition-colors ${
-                  contractAccepted
+                className={`sm:order-2 w-full sm:w-auto px-6 py-3 rounded-lg text-sm font-semibold shadow-md transition-colors ${contractAccepted
                     ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-gray-200 text-gray-500 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 Continue
               </button>
