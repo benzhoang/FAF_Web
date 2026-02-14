@@ -18,6 +18,7 @@ import Jobs from "./pages/TaskOwner/Jobs";
 import JobDetail from "./pages/TaskOwner/JobDetail";
 import Postjob from "./pages/TaskOwner/PostJob/Postjob";
 import Talents from "./pages/TaskOwner/Talents";
+import TalentDetail from "./pages/TaskOwner/TalentDetail";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import OTP from "./pages/OTP";
@@ -30,6 +31,7 @@ import JobListPage from "./pages/TaskOwner/PostJob/JobListPage";
 import Dashboard from "./pages/Admin/Dashboard";
 import UserManage from "./pages/Admin/UserManage";
 import Moderation from "./pages/Admin/Moderation";
+import Finance from "./pages/Admin/Finance";
 
 function App() {
   return (
@@ -209,6 +211,14 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/task-owner/talent/:id"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <TalentDetail />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/task-owner/post-job" element={<Postjob />} />
 
       {/* Admin Pages (no navbar/footer, has sidebar/own layout) */}
@@ -234,6 +244,14 @@ function App() {
         element={
           <ProtectedRoute roles={["admin"]}>
             <Moderation />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/finance"
+        element={
+          <ProtectedRoute roles={["admin"]}>
+            <Finance />
           </ProtectedRoute>
         }
       />

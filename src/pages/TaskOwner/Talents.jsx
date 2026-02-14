@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import TaskOwnerSidebar from "../../components/TaskOwnerSidebar";
 
 const featuredWorkers = [
@@ -47,6 +48,8 @@ const featuredWorkers = [
 ];
 
 const Talents = () => {
+    const navigate = useNavigate();
+
     return (
         <div className="min-h-screen bg-gray-50 flex">
             <TaskOwnerSidebar />
@@ -58,7 +61,7 @@ const Talents = () => {
                         <div>
                             <h1 className="text-2xl font-bold text-gray-900">Top Talents</h1>
                             <p className="text-sm text-gray-600">
-                                Khám phá những worker nổi bật, phù hợp với các dự án của bạn.
+                                Discover standout workers who fit your project needs.
                             </p>
                         </div>
                     </div>
@@ -72,7 +75,7 @@ const Talents = () => {
                             <div>
                                 <p className="text-sm text-gray-700">
                                     <span className="font-semibold">{featuredWorkers.length}</span>{" "}
-                                    talents được đề xuất dựa trên nhu cầu tuyển dụng phổ biến.
+                                    talents recommended based on common hiring needs.
                                 </p>
                             </div>
                             <div className="flex flex-wrap items-center gap-3">
@@ -146,11 +149,18 @@ const Talents = () => {
                                                 ${worker.hourlyRate}/hr
                                             </p>
                                             <p className="text-xs text-gray-500">
-                                                Ước tính: ${worker.hourlyRate * 40} / tuần
+                                                Estimated: ${worker.hourlyRate * 40} / week
                                             </p>
                                         </div>
-                                        <button className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-colors">
-                                            Xem hồ sơ
+                                        <button
+                                            onClick={() =>
+                                                navigate(`/task-owner/talent/${worker.id}`, {
+                                                    state: { worker },
+                                                })
+                                            }
+                                            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-sm transition-colors"
+                                        >
+                                            View profile
                                         </button>
                                     </div>
                                 </div>
