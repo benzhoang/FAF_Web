@@ -32,6 +32,10 @@ import Dashboard from "./pages/Admin/Dashboard";
 import UserManage from "./pages/Admin/UserManage";
 import Moderation from "./pages/Admin/Moderation";
 import Finance from "./pages/Admin/Finance";
+import Manager from "./pages/Manager/Request";
+import EmployeeManagement from "./pages/Manager/EmployeeManagement";
+import RequestDetail from "./pages/Manager/RequestDetail";
+import Finances from "./pages/Manager/Finances";
 
 function App() {
   return (
@@ -257,6 +261,36 @@ function App() {
       />
       <Route path="*" element={<Navigate to="/" replace />} />
       <Route path="/job-list" element={<JobListPage />} />
+      <Route
+        path="/manager/request"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <Manager />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/request/:id"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <RequestDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/manager/employees"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <EmployeeManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/manager/finances"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <Finances />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }
