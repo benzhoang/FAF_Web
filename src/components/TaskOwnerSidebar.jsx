@@ -6,7 +6,7 @@ const TaskOwnerSidebar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        localStorage.removeItem('accessToken');
         navigate('/');
     };
 

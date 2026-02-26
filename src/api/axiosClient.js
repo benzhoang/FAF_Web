@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -21,7 +21,17 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    console.error("API Error:", error.response || error);
+    // Handle 401 - Unauthorized (token expired or invalid)
+    if (error.response?.status === 401) {
+      localStorage.removeItem("accessToken");
+      window.location.href = "/signin";
+    }
+    
+    // Handle 403 - Forbidden (no permission)
+    if (error.response?.status === 403) {
+      window.location.href = "/forbidden";
+    }
+    
     return Promise.reject(error);
   }
 );

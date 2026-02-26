@@ -1,41 +1,30 @@
-import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useToast } from '../../../contexts/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
-const Step2 = ({ onBack, onNext }) => {
-    const navigate = useNavigate()
-    const [notes, setNotes] = useState({
-        milestone1: 'e.g., I will arrive 30 mins early for setup...',
-        milestone2: '',
-        milestone3: ''
-    })
+const Step2 = ({ onBack, onNext, job, proposalData, setProposalData }) => {
+    const toast = useToast();
+    const navigate = useNavigate();
 
-    const handleNoteChange = (milestone, value) => {
-        setNotes(prev => ({ ...prev, [milestone]: value }))
-    }
+    const handleChange = (field, value) => {
+        setProposalData(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
 
-    const milestones = [
-        {
-            id: 'milestone1',
-            day: 'Day 1: Setup & Morning Keynotes',
-            description: 'Submission of first 50 unedited highlight shots by 2:00 PM EST.',
-            points: '250 Pts',
-            note: notes.milestone1
-        },
-        {
-            id: 'milestone2',
-            day: 'Day 2: Full Event Coverage',
-            description: 'Coverage of networking event and closing ceremony. Raw files backup.',
-            points: '250 Pts',
-            note: notes.milestone2
-        },
-        {
-            id: 'milestone3',
-            day: 'Final Delivery & Gallery',
-            description: 'High-res edited files uploaded to studio portal. Transfer of rights.',
-            points: '500 Pts',
-            note: notes.milestone3
+    const handleSubmit = () => {
+        // Validate before going to next step
+        if (!proposalData.coverLetter.trim()) {
+            toast.warning('Please write a cover letter');
+            return;
         }
-    ]
+        if (!proposalData.proposedPrice || parseFloat(proposalData.proposedPrice) <= 0) {
+            toast.warning('Please enter a valid proposed price');
+            return;
+        }
+        onNext();
+    };
 
     return (
         <div className="max-w-7xl mx-auto">
@@ -46,54 +35,103 @@ const Step2 = ({ onBack, onNext }) => {
                         {/* Title */}
                         <div className="mb-8">
                             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-2">
-                                Review Milestones
+                                Submit Your Proposal
                             </h1>
                             <p className="text-sm text-slate-500">
-                                Please confirm the milestones proposed by Creative Studio Inc. You can add notes to each step if you have specific requirements or questions.
+                                Tell the employer why you're the best fit for this job and propose your price.
                             </p>
                         </div>
 
-                        {/* Proposed Schedule */}
+                        {/* Proposed Price */}
                         <div className="mb-8">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-extrabold text-slate-900">Proposed Schedule</h2>
-                                <div className="text-sm font-extrabold text-slate-900">Total: 1,000 FAF Pts</div>
-                            </div>
-
-                            <div className="space-y-6">
-                                {milestones.map((milestone, index) => (
-                                    <div key={milestone.id} className="border border-slate-200 rounded-2xl p-6 bg-slate-50">
-                                        <div className="flex items-start justify-between mb-4">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    <h3 className="text-base font-extrabold text-slate-900">{milestone.day}</h3>
-                                                    <span className="px-3 py-1 rounded-full bg-blue-100 text-xs font-extrabold text-blue-700">
-                                                        FUNDED
-                                                    </span>
-                                                </div>
-                                                <p className="text-sm text-slate-600 mb-4">{milestone.description}</p>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-base font-extrabold text-slate-900">{milestone.points}</div>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-xs font-bold text-slate-500 uppercase mb-2">
-                                                Add a note (optional)
-                                            </label>
-                                            <textarea
-                                                value={milestone.note}
-                                                onChange={(e) => handleNoteChange(milestone.id, e.target.value)}
-                                                placeholder={milestone.id === 'milestone1' ? 'e.g., I will arrive 30 mins early for setup...' : 'Type here...'}
-                                                className="w-full px-4 py-3 rounded-xl border border-slate-300 bg-white text-sm text-slate-700 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                                rows="3"
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
+                            <label className="block mb-4">
+                                <div className="flex items-center justify-between mb-2">
+                                    <span className="text-lg font-extrabold text-slate-900">Your Proposed Price</span>
+                                    <span className="text-sm text-slate-500">Budget: ${Number(job?.budget || 0).toLocaleString()}</span>
+                                </div>
+                                <div className="relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-semibold">$</span>
+                                    <input
+                                        type="number"
+                                        value={proposalData.proposedPrice}
+                                        onChange={(e) => handleChange('proposedPrice', e.target.value)}
+                                        min="1"
+                                        step="0.01"
+                                        required
+                                        className="w-full pl-8 pr-4 py-3 border-2 border-slate-300 rounded-xl text-xl font-bold focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                                        placeholder="Enter your price"
+                                    />
+                                </div>
+                                <p className="mt-2 text-sm text-slate-600">
+                                    💡 Tip: Be competitive but fair. Employers typically expect proposals within 80-120% of the budget.
+                                </p>
+                            </label>
                         </div>
+
+                        {/* Cover Letter */}
+                        <div className="mb-8">
+                            <label className="block">
+                                <span className="text-lg font-extrabold text-slate-900 mb-2 block">Cover Letter *</span>
+                                <textarea
+                                    value={proposalData.coverLetter}
+                                    onChange={(e) => handleChange('coverLetter', e.target.value)}
+                                    rows={12}
+                                    required
+                                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-xl focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all resize-none text-sm text-slate-700"
+                                    placeholder="Tell the employer why you're the best fit for this job...
+
+Include:
+• Your relevant experience and skills
+• Why you're interested in this project
+• How you'll approach the work
+• Any questions or clarifications you need"
+                                ></textarea>
+                                <div className="mt-2 flex items-center justify-between text-sm">
+                                    <span className="text-slate-600">
+                                        {proposalData.coverLetter.length} characters
+                                    </span>
+                                    <span className="text-slate-500">
+                                        ⚠️ Your cover letter will be reviewed by moderators
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+
+                        {/* Checkpoints/Milestones Info */}
+                        {job?.checkpoints && job.checkpoints.length > 0 && (
+                            <div className="mb-8">
+                                <h2 className="text-lg font-extrabold text-slate-900 mb-4">Project Milestones</h2>
+                                <div className="space-y-3">
+                                    {job.checkpoints.map((checkpoint, index) => (
+                                        <div key={checkpoint.id || index} className="border border-slate-200 rounded-xl p-4 bg-slate-50">
+                                            <div className="flex items-start justify-between gap-4">
+                                                <div className="flex-1">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="text-sm font-bold text-blue-600">Milestone {index + 1}</span>
+                                                        <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                                                            FUNDED
+                                                        </span>
+                                                    </div>
+                                                    <h3 className="text-base font-extrabold text-slate-900 mb-1">
+                                                        {checkpoint.name || `Checkpoint ${index + 1}`}
+                                                    </h3>
+                                                    {checkpoint.description && (
+                                                        <p className="text-sm text-slate-600">{checkpoint.description}</p>
+                                                    )}
+                                                </div>
+                                                {checkpoint.amount && (
+                                                    <div className="text-right shrink-0">
+                                                        <div className="text-base font-extrabold text-slate-900">
+                                                            ${Number(checkpoint.amount).toLocaleString()}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Footer Actions */}
                         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-slate-200">
@@ -101,13 +139,13 @@ const Step2 = ({ onBack, onNext }) => {
                                 onClick={onBack || (() => navigate(-1))}
                                 className="text-sm text-slate-600 hover:text-slate-900 font-medium"
                             >
-                                Back forward
+                                ← Back to Profile
                             </button>
                             <button
-                                onClick={onNext}
+                                onClick={handleSubmit}
                                 className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold shadow-md"
                             >
-                                Confirm & Submit Proposal
+                                Continue to Review
                             </button>
                         </div>
                     </div>
@@ -116,33 +154,28 @@ const Step2 = ({ onBack, onNext }) => {
                 {/* Sidebar */}
                 <div className="lg:col-span-1">
                     <div className="space-y-6">
-                        {/* Summary Card */}
+                        {/* Job Info Card */}
                         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 p-6">
                             <div className="flex items-center gap-2 mb-4">
-                                <div className="w-5 h-5 flex items-center justify-center">
-                                    <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                </div>
-                                <h3 className="text-lg font-extrabold text-slate-900">Summary</h3>
+                                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                <h3 className="text-lg font-extrabold text-slate-900">Job Details</h3>
                             </div>
                             <div className="space-y-3">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-600">Service Fee (5%)</span>
-                                    <span className="text-sm font-extrabold text-slate-900">-50 Pts</span>
+                                <div>
+                                    <div className="text-xs font-bold text-slate-500 uppercase mb-1">Applying to</div>
+                                    <div className="text-sm font-semibold text-slate-900">{job?.title}</div>
                                 </div>
                                 <div className="flex justify-between items-center">
-                                    <span className="text-sm text-slate-600">Escrow Protection</span>
-                                    <span className="text-sm font-extrabold text-emerald-600">Free</span>
+                                    <span className="text-sm text-slate-600">Budget</span>
+                                    <span className="text-sm font-extrabold text-slate-900">${Number(job?.budget || 0).toLocaleString()}</span>
                                 </div>
-                                <div className="pt-3 border-t border-slate-200">
-                                    <div className="flex justify-between items-center mb-1">
-                                        <span className="text-sm font-extrabold text-slate-900">Est. Earnings</span>
-                                        <span className="text-base font-extrabold text-blue-600">950 Pts</span>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="text-xs text-slate-500">-$950.00 USD</span>
-                                    </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-sm text-slate-600">Type</span>
+                                    <span className="text-sm font-extrabold text-slate-900">
+                                        {job?.job_type === 'SHORT_TERM' ? 'Short-term' : 'Long-term'}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -158,24 +191,14 @@ const Step2 = ({ onBack, onNext }) => {
                             </div>
                             <h3 className="text-base font-extrabold text-slate-900 text-center mb-2">FAF Secure Escrow</h3>
                             <p className="text-xs text-slate-600 text-center">
-                                Your payment is already funded by the client. Funds are released to you automatically upon milestone completion.
+                                Payment is secured by the client. Funds are released to you automatically upon milestone completion.
                             </p>
-                        </div>
-
-                        {/* Applying to Section */}
-                        <div className="flex items-center gap-3 text-sm text-slate-600">
-                            <div className="w-5 h-5 flex items-center justify-center">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <span>Applying to <span className="font-semibold text-slate-900">Event Photographer - 2 Day Gig</span></span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Step2
+export default Step2;

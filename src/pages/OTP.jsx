@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useToast } from '../contexts/ToastContext';
 import FAFLogo from '../assets/FAF-Logo.png';
 import { authApi } from '../api/auth.api';
 
@@ -8,6 +9,7 @@ const OTP = () => {
     const email = location.state?.email;
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const navigate = useNavigate();
+    const toast = useToast();
 
     const handleChange = (index, value) => {
         if (value.length > 1) return;
@@ -47,35 +49,29 @@ const OTP = () => {
         const otpCode = otp.join('');
         
         if (otpCode.length !== 6) {
-            alert('Vui lòng nhập đầy đủ 6 chữ số OTP');
+            toast.warning('Vui lòng nhập đầy đủ 6 chữ số OTP');
             return;
         }
 
         authApi.verifyOTP({ otp: otpCode, email })
             .then(response => {
-                console.log('OTP verification successful:', response);
-                alert('Xác thực OTP thành công!');
+                toast.success('Xác thực OTP thành công!');
                 navigate('/signin');
             })
             .catch(error => {
                 console.error('OTP verification failed:', error);
-                alert('Xác thực OTP thất bại. Vui lòng thử lại.');
+                toast.error('Xác thực OTP thất bại. Vui lòng thử lại.');
             });
-        console.log('OTP Code:', otpCode);
-        console.log('mail:', email);
-        
-        
     };
 
     const handleResend = () => {
         authApi.reSendOtp({ email })
             .then(response => {
-                console.log('Resend OTP successful:', response);
-                alert('Mã OTP đã được gửi lại đến email của bạn!');
+                toast.success('Mã OTP đã được gửi lại đến email của bạn!');
             })
             .catch(error => {
                 console.error('Resend OTP failed:', error);
-                alert('Gửi lại mã OTP thất bại. Vui lòng thử lại.');
+                toast.error('Gửi lại mã OTP thất bại. Vui lòng thử lại.');
             });
     };
 

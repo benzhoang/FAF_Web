@@ -12,6 +12,12 @@ export const authApi = {
   },
   reSendOtp(data) {
     return axiosClient.post("/auth/resend-otp", data);
+  },
+  forgotPassword(email) {
+    return axiosClient.post("/auth/forgot-password", { email });
+  },
+  resetPassword(data) {
+    return axiosClient.post("/auth/reset-password", data);
   }
 //   me() {
 //     return axiosClient.get("/auth/me");

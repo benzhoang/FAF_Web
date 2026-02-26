@@ -1,48 +1,87 @@
-import React, { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useMemo, useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useToast } from '../../../contexts/ToastContext'; // Added this import
 import PostingProgress from './PostingProgress';
 import Step1SelectType from './Step1';
 import Step2JobDetails from './Step2';
 import Step3BudgetMilestones from './Step3';
 import Step4Contract from './Step4';
 import Step5ReviewPublish from './Step5';
+import { jobsApi } from "../../../api/jobs.api";
 
 const Postjob = () => {
   const navigate = useNavigate();
+  const { id } = useParams(); // If id exists, we are editing
+  const isEditing = !!id;
+  const toast = useToast(); // Added this hook call
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [selectedType, setSelectedType] = useState('short-term');
+  const [loading, setLoading] = useState(false);
+  
+  // Form State
+  const [selectedType, setSelectedType] = useState('SHORT_TERM'); // backend expects uppercase
   const [contractHtml, setContractHtml] = useState('');
-
-  /* ===================== STEP 2 ===================== */
+  
+  // Step 2
   const [jobTitle, setJobTitle] = useState('');
   const [category, setCategory] = useState(null);
   const [jobDescription, setJobDescription] = useState('');
-  const [skills, setSkills] = useState([]);
-  const [skillInput, setSkillInput] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [skills, setSkills] = useState([]); // [{id, name}]
 
-  /* ===================== STEP 3 ===================== */
+  // Step 3
   const [totalBudget, setTotalBudget] = useState('5000');
   const [checkpoints, setCheckpoints] = useState([
     {
       id: 1,
       name: 'First Draft',
-      title: 'Initial Concept & Wireframes',
+      title: 'Initial Concept',
       points: '2000',
-      description:
-        'Delivery of initial wireframes for the homepage and product listing screens in Figma.',
-    },
-    {
-      id: 2,
-      name: 'Final Delivery',
-      title: 'High Fidelity Prototypes',
-      points: '3000',
-      description:
-        'Interactive prototypes with all assets exported and developer handover notes.',
+      description: 'Delivery of initial draft.',
     },
   ]);
 
-  /* ===================== ESCROW CALCULATION (FIX TDZ) ===================== */
+  // Step 4
+  const [contractAccepted, setContractAccepted] = useState(false);
+
+  /* ===================== FETCH DATA FOR EDITING ===================== */
+  useEffect(() => {
+    if (isEditing) {
+      setLoading(true);
+      jobsApi.getJobDetail(id)
+        .then(res => {
+          const job = res.data;
+          // Map backend data to state
+          setJobTitle(job.title);
+          setJobDescription(job.description);
+          setStartDate(job.start_date || '');
+          setEndDate(job.end_date || '');
+          setSelectedType(job.job_type);
+          setTotalBudget(String(job.budget));
+          // Category needs special handling to match object structure if Step2 relies on it
+          // Step2 expects object {id, name}. Job detail returns category_name and category_id
+          setCategory({ id: job.category_id, name: job.category_name });
+          
+          // Skills
+          setSkills(job.skills || []);
+          
+          // Checkpoints/Contract - Backend doesn't return full structure easily for editing contract/checkpoints yet
+          // For now, we only support editing Title, Desc, Category, Skills as per backend limitation
+          // So we might skip re-fetching checkpoints if we can't edit them fully
+          // However, for UX, let's keep them as is or try to fetch.
+          // Since backend updateJob only updates title/desc/cat/skills, we should probably warn user or locking Step 3/4?
+          // For this iteration, we focus on Title/Desc/Skills update.
+        })
+        .catch(err => {
+          console.error("Error fetching job for edit:", err);
+          toast.error("Could not load job details");
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [id, isEditing]);
+
+  /* ===================== ESCROW CALCULATION ===================== */
   const totalBudgetNum = parseFloat(totalBudget) || 0;
 
   const usedPoints = useMemo(() => {
@@ -65,9 +104,6 @@ const Postjob = () => {
   const isBudgetAllocated =
     Math.abs(usedPoints - totalBudgetNum) < 0.01 &&
     totalBudgetNum > 0;
-
-  /* ===================== STEP 4 ===================== */
-  const [contractAccepted, setContractAccepted] = useState(false);
 
   /* ===================== PROGRESS ===================== */
   const totalSteps = 5;
@@ -96,38 +132,10 @@ const Postjob = () => {
     navigate('/task-owner');
   };
 
-  /* ===================== SKILLS ===================== */
-  const handleAddSkill = (e) => {
-    if (e.key === 'Enter' && skillInput.trim() && skills.length < 5) {
-      e.preventDefault();
-      if (!skills.includes(skillInput.trim())) {
-        setSkills([...skills, skillInput.trim()]);
-        setSkillInput('');
-      }
-    }
-  };
-
-  const handleRemoveSkill = (skill) => {
-    setSkills(skills.filter((s) => s !== skill));
-  };
-
-  /* ===================== CHECKPOINTS ===================== */
+  /* ===================== CHECKPOINTS HANDLERS ===================== */
   const handleAddCheckpoint = () => {
-    const newId =
-      checkpoints.length > 0
-        ? Math.max(...checkpoints.map((cp) => cp.id)) + 1
-        : 1;
-
-    setCheckpoints([
-      ...checkpoints,
-      {
-        id: newId,
-        name: `Checkpoint ${checkpoints.length + 1}`,
-        title: '',
-        points: '',
-        description: '',
-      },
-    ]);
+    const newId = checkpoints.length > 0 ? Math.max(...checkpoints.map(cp => cp.id)) + 1 : 1;
+    setCheckpoints([...checkpoints, { id: newId, name: `Checkpoint ${checkpoints.length + 1}`, title: '', points: '', description: '' }]);
   };
 
   const handleRemoveCheckpoint = (id) => {
@@ -135,22 +143,56 @@ const Postjob = () => {
   };
 
   const handleUpdateCheckpoint = (id, field, value) => {
-    setCheckpoints(
-      checkpoints.map((cp) =>
-        cp.id === id ? { ...cp, [field]: value } : cp
-      )
-    );
+    setCheckpoints(checkpoints.map((cp) => cp.id === id ? { ...cp, [field]: value } : cp));
   };
 
-  /* ===================== PUBLISH ===================== */
-  const handlePublish = () => {
-    alert('Job đã được publish thành công! (demo)');
-    navigate('/task-owner');
+  /* ===================== PUBLISH / UPDATE ===================== */
+  const handlePublish = async () => {
+    try {
+      setLoading(true);
+      const payload = {
+        title: jobTitle,
+        description: jobDescription,
+        jobType: selectedType.replace(/-/g, '_').toUpperCase(), // SHORT_TERM or LONG_TERM
+        budget: totalBudgetNum,
+        categoryId: Number(category?.id), // Convert to number
+        skills: skills.filter(s => s && s.id).map(s => Number(s.id)), // Convert to numbers
+        startDate: startDate ? new Date(startDate).toISOString().split("T")[0] : null,
+        endDate: endDate ? new Date(endDate).toISOString().split("T")[0] : null,
+        checkpoints: checkpoints.map(cp => ({
+          title: cp.title || cp.name,
+          description: cp.description || "",
+          amount: parseFloat(cp.points),
+          due_date: cp.due_date ? new Date(cp.due_date).toISOString().split("T")[0] : null
+        })),
+        contractContent: contractHtml || "Standard FAF Contract", // Or generate derived content
+      };
+
+      console.log('🚀 Publishing job with payload:', JSON.stringify(payload, null, 2));
+
+      if (isEditing) {
+        await jobsApi.updateJob(id, payload);
+        toast.success('Job updated successfully!');
+      } else {
+        await jobsApi.postJobs(payload);
+        toast.success('Job posted successfully!');
+      }
+      navigate('/task-owner/jobs');
+    } catch (error) {
+      console.error("Error publishing job:", error);
+      toast.error(error.response?.data?.message || 'Failed to publish job');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSaveDraft = () => {
-    alert('Job đã được lưu nháp! (demo)');
+    toast.info('Draft saving not implemented yet');
   };
+
+  if (loading && isEditing && !jobTitle) {
+      return <div className="p-10 text-center">Loading Job Details...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -177,12 +219,13 @@ const Postjob = () => {
             setCategory={setCategory}
             jobDescription={jobDescription}
             setJobDescription={setJobDescription}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            endDate={endDate}
+            setEndDate={setEndDate}
             skills={skills}
             setSkills={setSkills}
-            skillInput={skillInput}
-            setSkillInput={setSkillInput}
-            onAddSkillKeyDown={handleAddSkill}
-            onRemoveSkill={handleRemoveSkill}
+            // skillInput props removed as handled by SkillSelector
             onContinue={handleContinue}
             onBack={handleBack}
           />
@@ -231,13 +274,17 @@ const Postjob = () => {
             jobDescription={jobDescription}
             skills={skills}
             totalBudgetNum={totalBudgetNum}
+            totalBudgetNum={totalBudgetNum}
             checkpoints={checkpoints}
+            startDate={startDate}
+            endDate={endDate}
             onEditStep1={() => setCurrentStep(1)}
             onEditStep2={() => setCurrentStep(2)}
             onEditStep3={() => setCurrentStep(3)}
             onPublish={handlePublish}
             onSaveDraft={handleSaveDraft}
             onBack={handleBack}
+            isEditing={isEditing}
           />
         )}
       </main>

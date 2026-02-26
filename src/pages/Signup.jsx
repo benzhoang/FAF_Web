@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../contexts/ToastContext";
 import FAFLogo from "../assets/FAF-Logo.png";
 import { authApi } from "../api/auth.api";
 
 const Signup = () => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [role, setRole] = useState("worker");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -37,44 +39,39 @@ const Signup = () => {
       !formData.password ||
       !formData.confirmPassword
     ) {
-      alert("Vui lòng điền đầy đủ thông tin");
+      toast.warning("Vui lòng điền đầy đủ thông tin");
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp");
+      toast.warning("Mật khẩu xác nhận không khớp");
       return;
     }
 
     if (formData.password.length < 6) {
-      alert("Mật khẩu phải có ít nhất 6 ký tự");
+      toast.warning("Mật khẩu phải có ít nhất 6 ký tự");
       return;
     }
 
     if (!formData.tos) {
-      alert("Vui lòng đồng ý với Điều khoản dịch vụ và Chính sách bảo mật");
+      toast.warning("Vui lòng đồng ý với Điều khoản dịch vụ và Chính sách bảo mật");
       return;
     }
 
-    // TODO: Gọi API đăng ký ở đây
-    console.log("Signup data:", { ...formData, role });
-
-    // TODO: Gọi API đăng ký ở đây
-    console.log("Signup data:", { ...formData, role });
+    // Call API to register
     try {
       const response = await authApi.register({
         email: formData.email,
         password: formData.password,
         role,
       });
-      console.log(response);
-      // truyền email sang trang OTP
+      // Navigate to OTP page with email
       navigate("/otp", {
         state: { email: formData.email },
       });
     } catch (error) {
       console.error("Registration failed:", error);
-      alert("Đăng ký thất bại");
+      toast.error("Đăng ký thất bại");
     }
   };
 

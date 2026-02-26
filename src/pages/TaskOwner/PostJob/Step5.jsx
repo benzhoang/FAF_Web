@@ -27,55 +27,12 @@ const Step5ReviewPublish = ({
   onSaveDraft,
   onBack,
   contractHtml,
+  startDate,
+  endDate,
 }) => {
-  const data = {
-    selectedType,
-    category,
-    jobTitle,
-    jobDescription,
-    skills,
-    totalBudgetNum,
-    checkpoints,
-    contractHtml,
-  };
-  console.log(data);
+  /* API Logic removed - delegated to parent Postjob.jsx */
 
-  const buildPayloadForBE = () => {
-    return {
-      title: jobTitle,
-      description: jobDescription,
-      jobType: selectedType === "short-term" ? "SHORT_TERM" : "LONG_TERM",
-      budget: Number(totalBudgetNum),
-
-      categoryId: Number(category?.id),
-
-      skills: skills.map((s) => Number(s.id)),
-
-      contractContent: contractHtml,
-
-      checkpoints: checkpoints.map((cp) => ({
-        title: cp.title || cp.name,
-        amount: Number(cp.points),
-        description: cp.description || "",
-        due_date: cp.dueDate
-          ? new Date(cp.dueDate).toISOString().split("T")[0]
-          : null,
-      })),
-    };
-  };
-
-  const handlePublish = async () => {
-    const payload = buildPayloadForBE();
-    
-    console.log("SEND TO BE:", payload);
-
-    try {
-      await jobsApi.postJobs(payload);
-      onPublish();
-    } catch (err) {
-      console.error("Publish job failed", err);
-    }
-  };
+  // ... (keep rendering)
 
 
   return (
@@ -128,6 +85,12 @@ const Step5ReviewPublish = ({
           <div>
             <div className="text-gray-500 mb-1">EXPERIENCE LEVEL</div>
             <div className="font-medium text-gray-900">Expert</div>
+          </div>
+          <div>
+            <div className="text-gray-500 mb-1">DURATION</div>
+            <div className="font-medium text-gray-900">
+              {startDate ? formatDate(startDate) : 'N/A'} - {endDate ? formatDate(endDate) : 'N/A'}
+            </div>
           </div>
         </div>
       </div>
@@ -278,7 +241,7 @@ const Step5ReviewPublish = ({
       {/* Actions */}
       <div className="flex flex-col items-center gap-3 mb-4">
         <button
-          onClick={handlePublish}
+          onClick={onPublish}
           className="w-full md:w-auto px-10 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-md transition-colors"
         >
           Publish Job Now

@@ -1,8 +1,11 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../../auth/AuthContext';
 
-const Step1 = ({ onNext }) => {
-    const navigate = useNavigate()
+const Step1 = ({ onNext, job }) => {
+    const navigate = useNavigate();
+    const { user } = useAuth();
+
     return (
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 px-6 sm:px-10 py-8">
             {/* Title */}
@@ -20,19 +23,19 @@ const Step1 = ({ onNext }) => {
                 <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
                     {/* Avatar + name */}
                     <div className="flex items-center gap-4">
-                        <div className="w-16 h-20 rounded-2xl bg-amber-100 shadow-md flex items-center justify-center">
-                            <div className="w-10 h-10 rounded-full bg-amber-300" />
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 text-white flex items-center justify-center font-extrabold text-2xl shadow-md">
+                            {user?.full_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
                         </div>
                         <div>
-                            <h2 className="text-lg font-extrabold text-slate-900">Alex Chen</h2>
-                            <button className="text-xs font-semibold text-blue-600 hover:text-blue-700">
-                                Professional Event Photographer
-                            </button>
-                            <div className="flex items-center gap-1 mt-2 text-xs text-slate-600">
-                                <span className="text-amber-400">★★★★★</span>
-                                <span className="font-semibold text-slate-900">4.9</span>
-                                <span>(124 reviews)</span>
-                            </div>
+                            <h2 className="text-lg font-extrabold text-slate-900">{user?.full_name || 'Your Name'}</h2>
+                            <div className="text-sm text-slate-600">{user?.email}</div>
+                            {user?.rating_avg && (
+                                <div className="flex items-center gap-1 mt-2 text-xs text-slate-600">
+                                    <span className="text-amber-400">★</span>
+                                    <span className="font-semibold text-slate-900">{user.rating_avg}</span>
+                                    <span>({user.total_reviews || 0} reviews)</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -41,56 +44,72 @@ const Step1 = ({ onNext }) => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
                     {/* Top skills */}
                     <div>
-                        <div className="text-xs font-bold text-slate-500 uppercase mb-2">Top skills</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase mb-2">Your skills</div>
                         <div className="flex flex-wrap gap-2">
-                            {['Event Photography', 'Adobe Lightroom', 'Portraiture', '4K Video'].map((tag) => (
-                                <span
-                                    key={tag}
-                                    className="px-3 py-1 rounded-full bg-blue-50 text-[11px] font-semibold text-blue-700"
-                                >
-                                    {tag}
-                                </span>
-                            ))}
+                            {user?.skills && user.skills.length > 0 ? (
+                                user.skills.slice(0, 4).map((skill, idx) => (
+                                    <span
+                                        key={idx}
+                                        className="px-3 py-1 rounded-full bg-blue-50 text-[11px] font-semibold text-blue-700"
+                                    >
+                                        {typeof skill === 'string' ? skill : skill.name}
+                                    </span>
+                                ))
+                            ) : (
+                                <span className="text-xs text-slate-500">No skills added yet</span>
+                            )}
                         </div>
                     </div>
 
                     {/* Verified info */}
                     <div>
-                        <div className="text-xs font-bold text-slate-500 uppercase mb-2">Verified info</div>
+                        <div className="text-xs font-bold text-slate-500 uppercase mb-2">Profile info</div>
                         <div className="space-y-1.5 text-xs text-slate-700">
                             <div className="flex items-center gap-2">
                                 <span className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center">
                                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                                 </span>
-                                <span>Identity Verified</span>
+                                <span>Email Verified</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                </span>
-                                <span>Payment Method Verified</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center">
-                                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                                </span>
-                                <span>98% Job Success Score</span>
-                            </div>
+                            {user?.hourly_rate && (
+                                <div className="flex items-center gap-2">
+                                    <span className="w-4 h-4 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <span className="w-2 h-2 rounded-full bg-blue-500" />
+                                    </span>
+                                    <span>Hourly Rate: ${user.hourly_rate}</span>
+                                </div>
+                            )}
+                            {user?.total_jobs_done && (
+                                <div className="flex items-center gap-2">
+                                    <span className="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
+                                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                                    </span>
+                                    <span>{user.total_jobs_done} Jobs Completed</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
 
+                {/* Bio */}
+                {user?.bio && (
+                    <div className="mb-6 p-4 bg-white rounded-xl border border-slate-200">
+                        <div className="text-xs font-bold text-slate-500 uppercase mb-2">About</div>
+                        <p className="text-sm text-slate-700 line-clamp-3">{user.bio}</p>
+                    </div>
+                )}
+
                 {/* Actions */}
                 <div className="flex flex-col items-center gap-4">
-                    <button 
+                    <button
                         onClick={onNext}
                         className="w-full sm:w-auto px-8 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-extrabold shadow-md"
                     >
-                        Continue to Milestones
+                        Continue to Proposal
                     </button>
                     <button
                         type="button"
-                        onClick={() => navigate(-1)}
+                        onClick={() => navigate(`/work/${job?.id || ''}`)}
                         className="text-xs text-slate-500 hover:text-slate-700 font-medium"
                     >
                         Cancel Application
@@ -104,8 +123,7 @@ const Step1 = ({ onNext }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Step1
-
+export default Step1;

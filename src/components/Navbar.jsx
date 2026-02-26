@@ -1,26 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import FAFLogo from '../assets/FAF-Logo.png';
-import { userApi } from '../api/user.api';
+import { useAuth } from '../auth/AuthContext';
 
 const Navbar = () => {
-    const [user, setUser] = useState(null);
+    const { user, logout } = useAuth();
     const [showDropdown, setShowDropdown] = useState(false);
     const navigate = useNavigate();
     const dropdownRef = useRef(null);
 
-    useEffect(() => {
-        // Kiểm tra user từ localStorage
-        userApi.getMe()
-            .then(response => {
-                setUser(response);
-                console.log(response)
-            }
-            )
-            .catch(() => {
-                setUser(null);
-            });
-    }, []);
+    // User state is now managed by AuthContext
+    // No need to fetch user data here
 
     // Đóng dropdown khi click ra ngoài
     useEffect(() => {
@@ -40,8 +30,7 @@ const Navbar = () => {
     }, [showDropdown]);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
-        setUser(null);
+        logout();
         setShowDropdown(false);
         navigate('/');
     };
@@ -51,8 +40,8 @@ const Navbar = () => {
     };
 
     const getInitials = (userData) => {
-        if (userData?.fullName) {
-            return userData.fullName
+        if (userData?.full_name) {
+            return userData.full_name
                 .split(' ')
                 .map(n => n[0])
                 .join('')
@@ -108,6 +97,24 @@ const Navbar = () => {
                         >
                             Dashboard
                         </NavLink>
+                        <NavLink
+                            to="/messages"
+                            className={({ isActive }) =>
+                                `transition-colors ${isActive ? 'text-blue-600' : 'hover:text-blue-600'} flex items-center gap-1`
+                            }
+                        >
+                            Messages
+                        </NavLink>
+                        <NavLink
+                            to="/notifications"
+                            className={({ isActive }) =>
+                                `transition-colors ${isActive ? 'text-blue-600' : 'hover:text-blue-600'} relative`
+                            }
+                        >
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                        </NavLink>
                     </div>
 
                     {/* Buttons */}
@@ -126,7 +133,7 @@ const Navbar = () => {
                                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                                         <div className="px-4 pb-2 text-sm text-gray-600">
                                             <p className="font-semibold text-gray-800">
-                                                Hello, {user?.fullName || user?.email || 'User'}
+                                                Hello, {user?.full_name || user?.email || 'User'}
                                             </p>
                                         </div>
                                         <div className="border-t border-gray-200 my-1"></div>

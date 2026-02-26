@@ -12,9 +12,11 @@ export const AuthProvider = ({ children }) => {
     try {
       const res = await userApi.getMe();
       setUser(res);
-      console.log(res)
-    } catch {
+      return res; // Return user data
+    } catch (error) {
+      // If token is invalid or expired, logout user
       logout();
+      throw error;
     } finally {
       setLoading(false);
     }
@@ -22,12 +24,27 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (token) => {
     localStorage.setItem("accessToken", token);
-    await fetchMe();
+    const userData = await fetchMe();
+    return userData; // Return user data for role-based redirect
   };
 
   const logout = () => {
     localStorage.removeItem("accessToken");
     setUser(null);
+  };
+
+  // Helper to get role-based home route
+  const getHomeRoute = (role) => {
+    switch (role) {
+      case "admin":
+        return "/admin/dashboard";
+      case "employer":
+        return "/task-owner";
+      case "worker":
+        return "/";
+      default:
+        return "/";
+    }
   };
 
   useEffect(() => {
@@ -37,7 +54,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, fetchMe, getHomeRoute }}>
       {children}
     </AuthContext.Provider>
   );

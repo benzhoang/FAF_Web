@@ -11,7 +11,6 @@ export default function JobListPage() {
     async function fetchJobs() {
       try {
         const response = await jobsApi.getAllJobs();
-        console.log(response)
         setJobs(response.data);
         setError(null);
       } catch (err) {

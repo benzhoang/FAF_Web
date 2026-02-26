@@ -53,8 +53,6 @@ const Step4Contract = ({
       });
   }, []);
 
-  console.log("fdf", contractInfo.clientEmail?.trim());
-
   const defaultContractText = useMemo(() => {
     const safeJobTitle = jobTitle ? `"${jobTitle}"` : "(chưa nhập Job Title)";
     const clientName =
@@ -63,7 +61,6 @@ const Step4Contract = ({
     const clientEmail =
       contractInfo.clientEmail?.trim() ||
       "....................................";
-    console.log("clientEmail:", clientEmail);
     const clientUserId =
       contractInfo.clientUserId?.trim() ||
       "..................................................";

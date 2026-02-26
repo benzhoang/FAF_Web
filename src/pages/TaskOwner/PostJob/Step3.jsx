@@ -17,6 +17,7 @@ const Step3BudgetMilestones = ({
   onBack,
 }) => {
   const [wallet, setWallet] = useState();
+  const [validationErrors, setValidationErrors] = useState([]);
 
   useEffect(() => {
     userApi
@@ -25,7 +26,7 @@ const Step3BudgetMilestones = ({
         setWallet(res.balance_points);
       })
       .catch((err) => {
-        console.log(err);
+        console.error('Failed to fetch wallet balance:', err);
       });
   });
 
@@ -61,7 +62,6 @@ const Step3BudgetMilestones = ({
 
                   if (!isNaN(value) && value >= 0 && value <= wallet) {
                     setTotalBudget(value);
-                    console.log(wallet);
                   } else {
                     return
                   }
@@ -188,11 +188,13 @@ const Step3BudgetMilestones = ({
 
                   <div>
                     <label className="block text-xs font-medium mb-1">
-                      Due Date
+                      Due Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
+                      required
                       value={checkpoint.due_date || ""}
+                      min={index > 0 && checkpoints[index - 1].due_date ? checkpoints[index - 1].due_date : new Date().toISOString().split('T')[0]}
                       onChange={(e) =>
                         onUpdateCheckpoint(
                           checkpoint.id,
@@ -202,6 +204,12 @@ const Step3BudgetMilestones = ({
                       }
                       className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
                     />
+                    {index > 0 && checkpoint.due_date && checkpoints[index - 1].due_date && 
+                     new Date(checkpoint.due_date) <= new Date(checkpoints[index - 1].due_date) && (
+                      <p className="text-xs text-red-600 mt-1">
+                        Must be after checkpoint {index} date
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -352,9 +360,57 @@ const Step3BudgetMilestones = ({
             )}
 
             <div className="space-y-3">
+              {validationErrors.length > 0 && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-start gap-2">
+                    <svg className="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-red-900 mb-1">Please fix the following:</p>
+                      <ul className="text-xs text-red-800 space-y-1">
+                        {validationErrors.map((error, idx) => (
+                          <li key={idx}>• {error}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
               <button
-                onClick={onContinue}
-                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md transition-colors"
+                onClick={() => {
+                  const errors = [];
+                  
+                  // Check if all checkpoints have due dates
+                  checkpoints.forEach((cp, idx) => {
+                    if (!cp.due_date) {
+                      errors.push(`Checkpoint ${idx + 1} is missing a due date`);
+                    }
+                  });
+                  
+                  // Check if dates are in chronological order
+                  for (let i = 1; i < checkpoints.length; i++) {
+                    if (checkpoints[i].due_date && checkpoints[i-1].due_date) {
+                      if (new Date(checkpoints[i].due_date) <= new Date(checkpoints[i-1].due_date)) {
+                        errors.push(`Checkpoint ${i + 1} due date must be after Checkpoint ${i}`);
+                      }
+                    }
+                  }
+                  
+                  // Check if budget is fully allocated
+                  if (!isBudgetAllocated) {
+                    errors.push(`Total checkpoint points (${usedPoints}) must equal budget (${totalBudgetNum})`);
+                  }
+                  
+                  if (errors.length > 0) {
+                    setValidationErrors(errors);
+                    return;
+                  }
+                  
+                  setValidationErrors([]);
+                  onContinue();
+                }}
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg shadow-md transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 Continue
               </button>

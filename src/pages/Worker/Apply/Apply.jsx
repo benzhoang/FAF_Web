@@ -1,10 +1,64 @@
-import React, { useState } from 'react'
-import Step1 from './Step1'
-import Step2 from './Step2'
-import Step3 from './Step3'
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { jobsApi } from '../../../api/jobs.api';
+import Step1 from './Step1';
+import Step2 from './Step2';
+import Step3 from './Step3';
 
 const Apply = () => {
-    const [currentStep, setCurrentStep] = useState(1)
+    const { id } = useParams();
+    const [currentStep, setCurrentStep] = useState(1);
+    const [job, setJob] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [proposalData, setProposalData] = useState({
+        coverLetter: '',
+        proposedPrice: ''
+    });
+
+    useEffect(() => {
+        if (id) {
+            fetchJob();
+        }
+    }, [id]);
+
+    const fetchJob = async () => {
+        try {
+            setLoading(true);
+            const res = await jobsApi.getJobDetail(id);
+            setJob(res.data);
+            // Initialize proposed price with job budget
+            setProposalData(prev => ({
+                ...prev,
+                proposedPrice: res.data.budget || ''
+            }));
+        } catch (err) {
+            console.error('Failed to fetch job:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600 font-semibold">Loading...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (!job) {
+        return (
+            <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+                <div className="text-center">
+                    <h2 className="text-2xl font-bold mb-4">Job not found</h2>
+                    <button onClick={() => window.history.back()} className="text-blue-600 hover:underline">Go back</button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-slate-50">
@@ -50,7 +104,7 @@ const Apply = () => {
                             </div>
                             <span className={`text-xs font-semibold ${currentStep >= 2 ? 'text-slate-900' : 'text-slate-500'
                                 }`}>
-                                Milestones
+                                Proposal
                             </span>
                         </div>
                         {/* Step 3 */}
@@ -69,9 +123,23 @@ const Apply = () => {
                     </div>
                 </div>
 
-                {currentStep === 1 && <Step1 onNext={() => setCurrentStep(2)} />}
-                {currentStep === 2 && <Step2 onBack={() => setCurrentStep(1)} onNext={() => setCurrentStep(3)} />}
-                {currentStep === 3 && <Step3 onBack={() => setCurrentStep(2)} />}
+                {currentStep === 1 && <Step1 onNext={() => setCurrentStep(2)} job={job} />}
+                {currentStep === 2 && (
+                    <Step2 
+                        onBack={() => setCurrentStep(1)} 
+                        onNext={() => setCurrentStep(3)} 
+                        job={job}
+                        proposalData={proposalData}
+                        setProposalData={setProposalData}
+                    />
+                )}
+                {currentStep === 3 && (
+                    <Step3 
+                        onBack={() => setCurrentStep(2)} 
+                        job={job}
+                        proposalData={proposalData}
+                    />
+                )}
             </main>
         </div>
     )

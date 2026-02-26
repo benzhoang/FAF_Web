@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useToast } from '../../contexts/ToastContext';
 import TaskOwnerSidebar from "../../components/TaskOwnerSidebar";
 import Step4Contract from "./PostJob/Step4";
 
 const Contracts = () => {
+    const toast = useToast();
     const navigate = useNavigate();
     const [selectedType, setSelectedType] = useState("short-term");
     const [contractAccepted, setContractAccepted] = useState(true);
@@ -16,7 +18,7 @@ const Contracts = () => {
         } catch (e) {
             console.error("Failed to save contract to localStorage", e);
         }
-        alert("Contract has been saved.");
+        toast.success("Contract has been saved.");
     };
 
     return (

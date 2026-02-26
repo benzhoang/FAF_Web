@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import FAFLogo from "../assets/FAF-Logo.png";
 import Loading from "../components/Loading";
 import { authApi } from "../api/auth.api";
-import { userApi } from "../api/user.api";
+import { useAuth } from "../auth/AuthContext";
 
 const Signin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -64,6 +64,8 @@ const Signin = () => {
   // };
 
   // dang nhap that
+  const { login, getHomeRoute } = useAuth();
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -77,23 +79,12 @@ const Signin = () => {
         throw new Error("Token not found");
       }
 
-      localStorage.setItem("accessToken", token);
+      // Use AuthContext login - it will fetch user and set state
+      const userData = await login(token);
 
-      // Gọi API để lấy thông tin user và role
-      const userInfo = await userApi.getMe();
-      const role = userInfo?.role;
-
-      // Điều hướng dựa trên role
-      if (role === "admin") {
-        navigate("/admin/dashboard");
-      } else if (role === "employer") {
-        navigate("/task-owner");
-      } else if (role === "worker") {
-        navigate("/");
-      } else {
-        // Nếu không có role hoặc role không hợp lệ, mặc định về trang chủ
-        navigate("/");
-      }
+      // Navigate based on role using helper
+      const homeRoute = getHomeRoute(userData.role);
+      navigate(homeRoute);
     } catch (err) {
       setError(
         err.response?.data?.message || "An error occurred during login.",
@@ -254,12 +245,12 @@ const Signin = () => {
                 />
                 Remember me
               </label>
-              <a
-                href="/forgot-password"
+              <Link
+                to="/forgot-password"
                 className="text-blue-600 font-semibold hover:underline"
               >
                 Forgot password?
-              </a>
+              </Link>
             </div>
 
             <button

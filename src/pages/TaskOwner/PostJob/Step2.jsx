@@ -1,5 +1,6 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { jobsApi } from "../../../api/jobs.api";
+import SkillSelector from "../../../components/SkillSelector";
 
 const Step2JobDetails = ({
   jobTitle,
@@ -8,15 +9,16 @@ const Step2JobDetails = ({
   setCategory,
   jobDescription,
   setJobDescription,
-  skillInput,
-  setSkillInput,
+  startDate,
+  setStartDate,
+  endDate,
+  setEndDate,
   skills,
   setSkills,
   onContinue,
   onBack,
 }) => {
   const [categories, setCategories] = useState([]);
-  const [allSkills, setAllSkills] = useState([]);
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
@@ -24,41 +26,7 @@ const Step2JobDetails = ({
       .getCate()
       .then((res) => setCategories(res.data))
       .catch(console.error);
-
-    jobsApi
-      .getSkills()
-      .then((res) => setAllSkills(res.data)) // [{id, name}]
-      .catch(console.error);
   }, []);
-
-  console.log(categories);
-  /* ================= FILTER SKILLS ================= */
-  const filteredSkills = useMemo(() => {
-    if (!skillInput.trim()) {
-      return [];
-    }
-
-    const keyword = skillInput.toLowerCase();
-
-    return allSkills
-      .filter(
-        (s) =>
-          s.name.toLowerCase().includes(keyword) &&
-          !skills.some((selected) => selected.id === s.id),
-      )
-      .slice(0, 5);
-  }, [skillInput, allSkills, skills]);
-
-  /* ================= HANDLERS ================= */
-  const onSelectSkill = (skill) => {
-    if (skills.length >= 5) return;
-    setSkills([...skills, skill]);
-    setSkillInput("");
-  };
-
-  const onRemoveSkill = (id) => {
-    setSkills(skills.filter((s) => s.id !== id));
-  };
 
   /* ================= UI ================= */
   return (
@@ -127,56 +95,45 @@ const Step2JobDetails = ({
             />
           </div>
 
+          {/* JOB DURATION */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Start Date
+              </label>
+              <input
+                type="date"
+                value={startDate ? String(startDate).split('T')[0] : ''}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                End Date
+              </label>
+              <input
+                type="date"
+                min={startDate ? String(startDate).split('T')[0] : ''}
+                value={endDate ? String(endDate).split('T')[0] : ''}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
           {/* SKILLS */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Skills Required
             </label>
-
-            <div className="flex flex-wrap gap-2 px-4 py-2 border border-gray-300 rounded-lg min-h-[44px]">
-              {skills.map((skill) => (
-                <span
-                  key={skill.id}
-                  className="flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm"
-                >
-                  {skill.name}
-                  <button
-                    onClick={() => onRemoveSkill(skill.id)}
-                    className="hover:text-red-500"
-                  >
-                    ✕
-                  </button>
-                </span>
-              ))}
-
-              {skills.length < 5 && (
-                <div className="relative flex-1 min-w-[200px]">
-                  <input
-                    value={skillInput}
-                    onChange={(e) => setSkillInput(e.target.value)}
-                    placeholder="Type to search skill..."
-                    className="w-full border-0 focus:outline-none text-sm"
-                  />
-
-                  {filteredSkills.length > 0 && (
-                    <div className="absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg">
-                      {filteredSkills.map((s) => (
-                        <div
-                          key={s.id}
-                          onClick={() => onSelectSkill(s)}
-                          className="px-4 py-2 text-sm hover:bg-blue-50 cursor-pointer"
-                        >
-                          {s.name}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
+            <SkillSelector 
+              selectedSkills={skills} 
+              onChange={setSkills} 
+              limit={5}
+            />
             <p className="text-xs text-gray-500 mt-2">
-              Select up to 5 skills from our database.
+              Select up to 5 skills.
             </p>
           </div>
         </div>

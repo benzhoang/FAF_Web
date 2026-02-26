@@ -1,12 +1,15 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import { ToastProvider } from "./contexts/ToastContext";
+import PublicLayout from "./components/PublicLayout";
 import HomePage from "./pages/Worker/HomePage";
 import FindWork from "./pages/Worker/FindWork";
 import WorkDetail from "./pages/Worker/WorkDetail";
+import ApplyToJob from "./pages/Worker/ApplyToJob";
 import Apply from "./pages/Worker/Apply/Apply";
 import Success from "./pages/Worker/Apply/Success";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
+import ActiveJob from "./pages/Worker/ActiveJob";
+import ContractSign from "./pages/Worker/ContractSign";
 import Settings from "./pages/Worker/Settings";
 import Wallet from "./pages/Worker/Wallet";
 import Depositpoint from "./pages/Worker/Depositpoint";
@@ -17,76 +20,60 @@ import Contracts from "./pages/TaskOwner/Contracts";
 import Jobs from "./pages/TaskOwner/Jobs";
 import JobDetail from "./pages/TaskOwner/JobDetail";
 import Postjob from "./pages/TaskOwner/PostJob/Postjob";
+import EditJob from "./pages/TaskOwner/EditJob";
 import Talents from "./pages/TaskOwner/Talents";
 import TalentDetail from "./pages/TaskOwner/TalentDetail";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
 import OTP from "./pages/OTP";
-import ForgotPage from "./pages/ForgotPage";
-import ForgotOTP from "./pages/ForgotOTP";
-import ResetPage from "./pages/ResetPage";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./auth/ProtectedRoute";
-import "./App.css";
 import JobListPage from "./pages/TaskOwner/PostJob/JobListPage";
 import Dashboard from "./pages/Admin/Dashboard";
 import UserManage from "./pages/Admin/UserManage";
 import Moderation from "./pages/Admin/Moderation";
 import Finance from "./pages/Admin/Finance";
+import Forbidden from "./components/Forbidden";
+import PublicProfile from "./pages/PublicProfile";
+import ToastDemo from "./pages/ToastDemo";
+import EmployerContractSign from "./pages/TaskOwner/EmployerContractSign";
+import CheckpointReview from "./pages/TaskOwner/CheckpointReview";
+import Messaging from "./pages/Messaging/Messaging";
+import Notifications from "./pages/Notifications";
+import { ChatProvider } from "./contexts/ChatContext";
+import ChatWidget from "./components/Chat/ChatWidget";
+import "./App.css";
 
 function App() {
   return (
-    <Routes>
-      {/* Auth pages (no navbar/footer) */}
+    <ToastProvider>
+      <ChatProvider>
+      <Routes>
+      {/* ========== AUTH ROUTES (Public, No Layout) ========== */}
       <Route path="/signin" element={<Signin />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/otp" element={<OTP />} />
-      <Route path="/forgot-password" element={<ForgotPage />} />
-      <Route path="/forgot-otp" element={<ForgotOTP />} />
-      <Route path="/reset-password" element={<ResetPage />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/forbidden" element={<Forbidden />} />
 
-      {/* Public pages (with navbar/footer) */}
-      <Route
-        path="/"
-        element={
-          // <ProtectedRoute roles={[""]}>
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <HomePage />
-            </main>
-            <Footer />
-          </div>
-          // </ProtectedRoute>
-        }
-      />
+      {/* ========== PUBLIC ROUTES (With Navbar/Footer) ========== */}
+      <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+      <Route path="/work/:id" element={<PublicLayout><WorkDetail /></PublicLayout>} />
+      <Route path="/toast-demo" element={<PublicLayout><ToastDemo /></PublicLayout>} />
+
+      {/* ========== WORKER ROUTES (With Navbar/Footer) ========== */}
       <Route
         path="/find-work"
         element={
           <ProtectedRoute roles={["worker", "admin"]}>
-            <div className="w-full min-h-screen flex flex-col">
-              <Navbar />
-              <main className="flex-grow w-full">
-                <FindWork />
-              </main>
-              <Footer />
-            </div>
+            <PublicLayout><FindWork /></PublicLayout>
           </ProtectedRoute>
         }
       />
       <Route
-        path="/work/:id"
-        element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <WorkDetail />
-            </main>
-            <Footer />
-          </div>
-        }
-      />
-      <Route
-        path="/apply"
+        path="/apply/:id"
         element={
           <ProtectedRoute roles={["worker", "admin"]}>
             <Apply />
@@ -104,70 +91,99 @@ function App() {
       <Route
         path="/dashboard"
         element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <WorkerDashboard />
-            </main>
-            <Footer />
-          </div>
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><WorkerDashboard /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/my-job"
+        element={
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><ActiveJob /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contract/:id/sign"
+        element={
+          <ProtectedRoute roles={["worker", "employer", "admin"]}>
+            <PublicLayout><ContractSign /></PublicLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/settings"
         element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <Settings />
-            </main>
-            <Footer />
-          </div>
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><Settings /></PublicLayout>
+          </ProtectedRoute>
         }
       />
+
       <Route
         path="/wallet"
         element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <Wallet />
-            </main>
-            <Footer />
-          </div>
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><Wallet /></PublicLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/deposit-points"
         element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <Depositpoint />
-            </main>
-            <Footer />
-          </div>
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><Depositpoint /></PublicLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/withdraw-points"
         element={
-          <div className="w-full min-h-screen flex flex-col">
-            <Navbar />
-            <main className="flex-grow w-full">
-              <Withdrawpoint />
-            </main>
-            <Footer />
-          </div>
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <PublicLayout><Withdrawpoint /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute roles={["worker", "employer", "admin"]}>
+            <PublicLayout><Messaging /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute roles={["worker", "employer", "admin"]}>
+            <PublicLayout><Notifications /></PublicLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* Task Owner Pages (no navbar/footer, has sidebar/own layout) */}
+      {/* ========== EMPLOYER ROUTES (Custom Layout with Sidebar) ========== */}
       <Route
         path="/task-owner"
         element={
-          <ProtectedRoute roles={["employer", "admin"]}>
+          <ProtectedRoute roles={['employer', 'admin']}>
             <TaskOwnerPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/contract/:id/sign"
+        element={
+          <ProtectedRoute roles={['employer', 'admin']}>
+            <EmployerContractSign />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/contracts/:contractId/review"
+        element={
+          <ProtectedRoute roles={['employer', 'admin']}>
+            <CheckpointReview />
           </ProtectedRoute>
         }
       />
@@ -219,9 +235,24 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/task-owner/post-job" element={<Postjob />} />
+      <Route
+        path="/task-owner/post-job"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <Postjob />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/task-owner/jobs/:id/edit"
+        element={
+          <ProtectedRoute roles={["employer", "admin"]}>
+            <EditJob />
+          </ProtectedRoute>
+        }
+      />
 
-      {/* Admin Pages (no navbar/footer, has sidebar/own layout) */}
+      {/* ========== ADMIN ROUTES (Custom Layout with Sidebar) ========== */}
       <Route
         path="/admin/dashboard"
         element={
@@ -230,7 +261,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/admin/user-management"
         element={
@@ -255,9 +285,25 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+
+      {/* ========== OTHER ROUTES ========== */}
       <Route path="/job-list" element={<JobListPage />} />
+
+      <Route
+        path="/profile/:id"
+        element={
+          <ProtectedRoute roles={["worker", "employer", "admin"]}>
+            <PublicProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========== FALLBACK (Must be last) ========== */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    <ChatWidget />
+    </ChatProvider>
+    </ToastProvider>
   );
 }
 

@@ -1,232 +1,110 @@
-import React from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useToast } from "../../contexts/ToastContext";
 import TaskOwnerSidebar from "../../components/TaskOwnerSidebar";
-
-// Fallback mock data in case user refreshes detail page (no location.state)
-const fallbackJobs = [
-    {
-        id: "1",
-        title: "Landing Page Redesign",
-        status: "Open",
-        type: "Short-term",
-        budget: 2500,
-        createdAt: "2026-01-25",
-        proposals: 8,
-        category: "Design",
-        location: "Remote",
-        description:
-            "Redesign the main marketing landing page to improve conversion rate and modernize the visual style.",
-    },
-    {
-        id: "2",
-        title: "Mobile App Development (iOS & Android)",
-        status: "In Progress",
-        type: "Long-term",
-        budget: 12000,
-        createdAt: "2026-01-18",
-        proposals: 15,
-        category: "Development",
-        location: "Remote",
-        description:
-            "Build a cross-platform mobile app for an e-commerce platform, including authentication, product catalog, and checkout.",
-    },
-    {
-        id: "3",
-        title: "SEO Audit & Optimization",
-        status: "Completed",
-        type: "Short-term",
-        budget: 1800,
-        createdAt: "2026-01-05",
-        proposals: 6,
-        category: "Marketing",
-        location: "Hybrid",
-        description:
-            "Perform a full SEO audit and implement on-page optimizations for a 50-page website.",
-    },
-];
-
-// Enrich base job data into a more detailed, professional structure
-const buildDetailedJob = (job) => {
-    const base = {
-        responsibilities: [],
-        requirements: [],
-        skills: [],
-        milestones: [],
-        collaboration: {
-            timezone: "Flexible, overlap 3–4 hours with GMT+7",
-            communication: "Slack, Zoom, and email (English)",
-            reporting: "Weekly check-ins with progress summary",
-        },
-    };
-
-    switch (String(job.id)) {
-        case "1":
-            return {
-                ...job,
-                ...base,
-                description:
-                    job.description ||
-                    "We are looking for a product-minded designer to refresh our main marketing landing page with a modern, conversion-focused experience.",
-                responsibilities: [
-                    "Audit the current landing page UX and identify friction points.",
-                    "Create 2–3 high-fidelity layout options in Figma.",
-                    "Define a responsive design system (desktop, tablet, mobile).",
-                    "Collaborate with our marketing lead to refine messaging and hierarchy.",
-                    "Prepare developer-ready assets and handoff documentation.",
-                ],
-                requirements: [
-                    "3+ years experience in product or marketing design.",
-                    "Strong portfolio with web landing page projects.",
-                    "Proficiency with Figma and modern design systems.",
-                    "Ability to reason about conversion funnels and A/B testing.",
-                ],
-                skills: ["Figma", "Conversion Optimization", "Design Systems", "Responsive Web"],
-                milestones: [
-                    {
-                        label: "Discovery & Wireframes",
-                        eta: "Week 1",
-                        description:
-                            "Review existing page performance, run stakeholder interviews, and deliver low-fidelity wireframes.",
-                    },
-                    {
-                        label: "Visual Design",
-                        eta: "Week 2",
-                        description:
-                            "Deliver final high-fidelity designs for all breakpoints and key interactions.",
-                    },
-                    {
-                        label: "Handoff",
-                        eta: "Week 3",
-                        description:
-                            "Prepare dev handoff, design tokens, and support implementation QA.",
-                    },
-                ],
-                collaboration: {
-                    timezone: "GMT+7 preferred, but flexible",
-                    communication: "Slack for async, Zoom for weekly review calls",
-                    reporting: "Short written update twice per week",
-                },
-            };
-        case "2":
-            return {
-                ...job,
-                ...base,
-                description:
-                    job.description ||
-                    "Long-term engagement to build and maintain a cross-platform mobile app for our e-commerce business.",
-                responsibilities: [
-                    "Design and implement app architecture using React Native or Flutter.",
-                    "Integrate with existing REST/GraphQL APIs and payment gateways.",
-                    "Collaborate with in-house designer to translate UI specs into production-ready screens.",
-                    "Set up analytics, error tracking, and performance monitoring.",
-                    "Provide ongoing maintenance and feature iterations.",
-                ],
-                requirements: [
-                    "5+ years experience building production mobile apps.",
-                    "Shipped at least 2 apps to App Store / Google Play.",
-                    "Comfortable with CI/CD, testing, and app store submission processes.",
-                    "Solid understanding of security best practices.",
-                ],
-                skills: ["React Native", "TypeScript", "REST APIs", "CI/CD", "Firebase"],
-                milestones: [
-                    {
-                        label: "MVP Release",
-                        eta: "Month 1–2",
-                        description:
-                            "Authentication, product catalog, cart, and basic checkout flow shipped to test flight.",
-                    },
-                    {
-                        label: "Public Launch",
-                        eta: "Month 3",
-                        description:
-                            "Stabilization, performance work, analytics, and app store submission.",
-                    },
-                    {
-                        label: "Ongoing Iteration",
-                        eta: "Month 4+",
-                        description:
-                            "New features, A/B tests, and maintenance based on usage data.",
-                    },
-                ],
-                collaboration: {
-                    timezone: "Prefer 3–4 hours overlap with GMT+7",
-                    communication: "Weekly roadmap call, daily async standups in Slack",
-                    reporting: "Sprint-based planning with Jira board",
-                },
-            };
-        case "3":
-        default:
-            return {
-                ...job,
-                ...base,
-                description:
-                    job.description ||
-                    "End-to-end SEO engagement to improve organic visibility and search performance.",
-                responsibilities: [
-                    "Conduct full SEO audit: technical, on-page, and content.",
-                    "Define prioritized roadmap of SEO recommendations.",
-                    "Implement on-page optimizations for key landing pages.",
-                    "Collaborate with content team on keyword strategy.",
-                ],
-                requirements: [
-                    "Hands-on experience with SEO tools (Ahrefs, SEMrush, GSC).",
-                    "Ability to communicate clearly with non-technical stakeholders.",
-                    "Solid understanding of technical SEO and site performance.",
-                ],
-                skills: ["SEO", "Google Search Console", "Analytics", "Content Strategy"],
-                milestones: [
-                    {
-                        label: "Audit & Strategy",
-                        eta: "Week 1–2",
-                        description:
-                            "Deliver full SEO audit and prioritized roadmap with expected impact.",
-                    },
-                    {
-                        label: "Implementation",
-                        eta: "Week 3–4",
-                        description:
-                            "Apply technical and on-page changes in collaboration with our team.",
-                    },
-                    {
-                        label: "Monitoring",
-                        eta: "Week 5+",
-                        description:
-                            "Track rankings, traffic, and iterate on the roadmap as needed.",
-                    },
-                ],
-            };
-    }
-};
+import { jobsApi } from "../../api/jobs.api";
+import { matchingApi } from "../../api/matching.api";
+import { contractsApi } from "../../api/contracts.api";
+import { chatApi } from "../../api/chat.api";
 
 const JobDetail = () => {
     const navigate = useNavigate();
     const { id } = useParams();
-    const location = useLocation();
+    const toast = useToast();
+    
+    const [job, setJob] = useState(null);
+    const [contractDetail, setContractDetail] = useState(null);
+    const [proposals, setProposals] = useState([]);
+    const [recommendedWorkers, setRecommendedWorkers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [activeTab, setActiveTab] = useState('proposals');
 
-    const jobFromState = location.state?.job;
-    const job =
-        jobFromState || fallbackJobs.find((item) => String(item.id) === String(id));
+    useEffect(() => {
+        fetchJobData();
+    }, [id]);
 
-    if (!job) {
-        return (
-            <div className="min-h-screen bg-gray-50 flex">
-                <TaskOwnerSidebar />
-                <div className="flex-1 flex flex-col items-center justify-center">
-                    <p className="text-gray-600 mb-4 text-sm">
-                        Job not found or no data available.
-                    </p>
-                    <button
-                        onClick={() => navigate("/task-owner/jobs")}
-                        className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                    >
-                        Back to My Jobs
-                    </button>
-                </div>
+    const fetchJobData = async () => {
+        try {
+            setLoading(true);
+            const [jobRes, proposalsRes, recommendedRes] = await Promise.all([
+                jobsApi.getJobDetail(id),
+                jobsApi.getJobProposals(id),
+                matchingApi.getRecommendedWorkers(id)
+            ]);
+            
+            setJob(jobRes.data);
+            setProposals(proposalsRes.data || []);
+            setRecommendedWorkers(recommendedRes.data || []);
+
+            // Fetch full contract details if contract exists
+            if (jobRes.data.contract?.id) {
+                try {
+                    console.log('Fetching contract detail for ID:', jobRes.data.contract.id);
+                    const contractRes = await contractsApi.getContractById(jobRes.data.contract.id);
+                    console.log('Contract detail fetched:', contractRes.data);
+                    setContractDetail(contractRes.data);
+                } catch (contractErr) {
+                    console.warn('Failed to fetch contract detail:', contractErr);
+                    // Use basic contract info from job data as fallback
+                    setContractDetail(jobRes.data.contract);
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching job details:", err);
+            setError("Failed to load job details.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleAcceptProposal = async (proposalId) => {
+        if (!window.confirm("Accept this proposal? This will create a contract and lock funds.")) return;
+        try {
+            await jobsApi.acceptProposal(proposalId);
+            toast.success("Proposal accepted!");
+            fetchJobData(); // Refresh data
+        } catch (err) {
+            console.error("Error accepting proposal:", err);
+            toast.error(err.response?.data?.message || "Failed to accept proposal");
+        }
+    };
+
+    const handleRejectProposal = async (proposalId) => {
+        if (!window.confirm("Reject this proposal?")) return;
+        try {
+            await jobsApi.rejectProposal(proposalId);
+            fetchJobData(); // Refresh data
+        } catch (err) {
+            console.error("Error rejecting proposal:", err);
+            toast.success("Proposal rejected");
+        }
+    };
+
+    const handleInviteWorker = (workerId) => {
+        toast.info(`Invite sent to worker #${workerId}! (Demo)`);
+    };
+
+    const handleStartChat = async (userId) => {
+        try {
+            await chatApi.startChat(userId);
+            navigate('/messages');
+        } catch (error) {
+            console.error('Error starting chat:', error);
+            toast.error('Failed to open chat');
+        }
+    };
+
+    if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>;
+    if (error || !job) return (
+        <div className="min-h-screen bg-gray-50 flex">
+            <TaskOwnerSidebar />
+            <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <p className="text-red-500 mb-4">{error || "Job not found"}</p>
+                <button onClick={() => navigate("/task-owner/jobs")} className="text-blue-600 hover:underline">Back to My Jobs</button>
             </div>
-        );
-    }
-
-    const detailedJob = buildDetailedJob(job);
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 flex">
@@ -243,27 +121,36 @@ const JobDetail = () => {
                             >
                                 <span className="mr-1">←</span> Back to My Jobs
                             </button>
-                            <h1 className="text-2xl font-bold text-gray-900">{detailedJob.title}</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
                             <p className="text-sm text-gray-600 mt-1">
-                                {detailedJob.category} • {detailedJob.location} •{" "}
-                                {new Date(detailedJob.createdAt).toLocaleDateString()}
+                                {job.category_name} • {new Date(job.created_at).toLocaleDateString()}
                             </p>
                         </div>
-                        <div className="flex flex-col items-end gap-2">
-                            <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${detailedJob.status === "Open"
-                                    ? "bg-green-100 text-green-700"
-                                    : detailedJob.status === "In Progress"
-                                        ? "bg-blue-100 text-blue-700"
-                                        : "bg-gray-100 text-gray-700"
-                                    }`}
-                            >
-                                {detailedJob.status}
-                            </span>
+                        <div className="flex flex-col items-end gap-3">
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => navigate(`/task-owner/jobs/${job.id}/edit`)}
+                                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                >
+                                    Edit Job
+                                </button>
+                                <span
+                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${job.status === "OPEN"
+                                        ? "bg-green-100 text-green-700"
+                                        : job.status === "IN_PROGRESS"
+                                            ? "bg-blue-100 text-blue-700"
+                                            : job.status === "CANCELLED"
+                                            ? "bg-red-100 text-red-700" 
+                                            : "bg-gray-100 text-gray-700"
+                                        }`}
+                                >
+                                    {job.status}
+                                </span>
+                            </div>
                             <div className="text-xs text-gray-500">
-                                Total budget:{" "}
+                                Budget:{" "}
                                 <span className="font-semibold text-gray-900">
-                                    ${detailedJob.budget.toLocaleString()}
+                                    ${Number(job.budget).toLocaleString()}
                                 </span>
                             </div>
                         </div>
@@ -278,146 +165,537 @@ const JobDetail = () => {
                             {/* Overview */}
                             <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                                 <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                                    Project overview
+                                    Description
                                 </h2>
-                                <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                                    {detailedJob.description}
+                                <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                    {job.description || "No description provided."}
                                 </p>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-gray-600">
-                                    <div>
-                                        <p className="uppercase tracking-wide font-semibold text-gray-500 mb-1">
-                                            Job type
-                                        </p>
-                                        <p className="text-gray-900 text-sm font-medium">
-                                            {detailedJob.type}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="uppercase tracking-wide font-semibold text-gray-500 mb-1">
-                                            Posted date
-                                        </p>
-                                        <p className="text-gray-900 text-sm font-medium">
-                                            {new Date(detailedJob.createdAt).toLocaleDateString()}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="uppercase tracking-wide font-semibold text-gray-500 mb-1">
-                                            Location
-                                        </p>
-                                        <p className="text-gray-900 text-sm font-medium">
-                                            {detailedJob.location}
-                                        </p>
-                                    </div>
-                                </div>
                             </section>
 
-                            {/* Responsibilities */}
-                            {detailedJob.responsibilities?.length > 0 && (
+                            {/* Skills */}
+                            {job.skills && job.skills.length > 0 && (
                                 <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                                     <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                                        Key responsibilities
+                                        Skills Required
                                     </h2>
-                                    <ul className="list-disc list-inside space-y-2 text-sm text-gray-700">
-                                        {detailedJob.responsibilities.map((item) => (
-                                            <li key={item}>{item}</li>
-                                        ))}
-                                    </ul>
-                                </section>
-                            )}
-
-                            {/* Requirements & skills */}
-                            {(detailedJob.requirements?.length || detailedJob.skills?.length) && (
-                                <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                                        Ideal candidate profile
-                                    </h2>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                                        {detailedJob.requirements?.length > 0 && (
-                                            <div>
-                                                <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                                                    Requirements
-                                                </h3>
-                                                <ul className="list-disc list-inside space-y-2 text-gray-700">
-                                                    {detailedJob.requirements.map((item) => (
-                                                        <li key={item}>{item}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                        {detailedJob.skills?.length > 0 && (
-                                            <div>
-                                                <h3 className="text-sm font-semibold text-gray-900 mb-2">
-                                                    Preferred skills
-                                                </h3>
-                                                <div className="flex flex-wrap gap-2">
-                                                    {detailedJob.skills.map((skill) => (
-                                                        <span
-                                                            key={skill}
-                                                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800"
-                                                        >
-                                                            {skill}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Timeline / milestones */}
-                            {detailedJob.milestones?.length > 0 && (
-                                <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                    <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                                        Tentative timeline & milestones
-                                    </h2>
-                                    <ol className="space-y-3 text-sm text-gray-700">
-                                        {detailedJob.milestones.map((milestone) => (
-                                            <li
-                                                key={milestone.label}
-                                                className="border border-gray-100 rounded-lg px-4 py-3 bg-gray-50"
+                                    <div className="flex flex-wrap gap-2">
+                                        {job.skills.map((skill) => (
+                                            <span
+                                                key={skill.id}
+                                                className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800"
                                             >
-                                                <div className="flex items-center justify-between mb-1">
-                                                    <p className="font-semibold text-gray-900">
-                                                        {milestone.label}
-                                                    </p>
-                                                    <span className="text-xs text-gray-500">
-                                                        {milestone.eta}
-                                                    </span>
-                                                </div>
-                                                <p className="text-xs text-gray-700">
-                                                    {milestone.description}
-                                                </p>
-                                            </li>
+                                                {skill.name}
+                                            </span>
                                         ))}
-                                    </ol>
+                                    </div>
                                 </section>
                             )}
 
-                            {/* Activity */}
-                            <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                                    Activity & proposals
-                                </h2>
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-                                    <div>
-                                        <p className="text-gray-500">Proposals</p>
-                                        <p className="font-semibold text-gray-900">
-                                            {detailedJob.proposals}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-500">Job type</p>
-                                        <p className="font-semibold text-gray-900">
-                                            {detailedJob.type}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <p className="text-gray-500">Posted date</p>
-                                        <p className="font-semibold text-gray-900">
-                                            {new Date(detailedJob.createdAt).toLocaleDateString()}
-                                        </p>
-                                    </div>
+                            {/* Tabs Section */}
+                            <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                                <div className="border-b border-gray-200 flex overflow-x-auto">
+                                    {['proposals', 'recommended', 'checkpoints', 'contract'].map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`flex-1 min-w-[120px] py-4 text-sm font-semibold text-center transition-colors whitespace-nowrap capitalize ${
+                                                activeTab === tab 
+                                                ? 'text-blue-600 border-b-2 border-blue-600 bg-blue-50/50' 
+                                                : 'text-gray-600 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {tab === 'proposals' ? `Proposals (${proposals.length})` : 
+                                             tab === 'recommended' ? 'Candidates' : 
+                                             tab}
+                                        </button>
+                                    ))}
+                                </div>
+                                
+                                <div className="p-6">
+                                    {activeTab === 'proposals' && (
+                                        <div className="space-y-4">
+                                            {proposals.length === 0 ? (
+                                                <p className="text-gray-500 text-sm italic">No proposals yet.</p>
+                                            ) : (
+                                                proposals.map((proposal) => (
+                                                    <div key={proposal.id} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                                                        <div className="flex gap-4 mb-3">
+                                                            {/* Worker Avatar */}
+                                                            <div 
+                                                                onClick={() => navigate(`/profile/${proposal.worker_id}`)}
+                                                                className="cursor-pointer hover:opacity-80 transition-opacity"
+                                                            >
+                                                                {proposal.worker_avatar ? (
+                                                                    <img 
+                                                                        src={proposal.worker_avatar} 
+                                                                        alt={proposal.worker_name || 'Worker'}
+                                                                        className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg border-2 border-gray-200">
+                                                                        {(proposal.worker_name || proposal.worker_email || 'W').charAt(0).toUpperCase()}
+                                                                    </div>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Worker Info & Proposal Details */}
+                                                            <div className="flex-1">
+                                                                <div className="flex justify-between items-start mb-2">
+                                                                    <div>
+                                                                        <div className="flex items-center gap-2">
+                                                                            <h3 
+                                                                                onClick={() => navigate(`/profile/${proposal.worker_id}`)}
+                                                                                className="font-bold text-gray-900 hover:text-blue-600 cursor-pointer transition-colors text-base"
+                                                                            >
+                                                                                {proposal.worker_name || 'Anonymous Worker'}
+                                                                            </h3>
+                                                                            {proposal.worker_tier && (
+                                                                                <span className={`text-[9px] font-extrabold tracking-wide uppercase rounded-full px-2 py-0.5 border ${
+                                                                                    proposal.worker_tier === 'EXPERT' ? 'bg-purple-50 text-purple-700 border-purple-100' :
+                                                                                    proposal.worker_tier === 'PRO' ? 'bg-blue-50 text-blue-700 border-blue-100' :
+                                                                                    'bg-gray-50 text-gray-700 border-gray-100'
+                                                                                }`}>
+                                                                                    {proposal.worker_tier}
+                                                                                </span>
+                                                                            )}
+                                                                        </div>
+                                                                        <p className="text-xs text-gray-500 mt-0.5">
+                                                                            {proposal.worker_email}
+                                                                        </p>
+                                                                        <p className="text-xs text-gray-400 mt-1">
+                                                                            Applied on {new Date(proposal.created_at).toLocaleDateString()}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <p className="font-bold text-gray-900 text-lg">${Number(proposal.proposed_price || 0).toLocaleString()}</p>
+                                                                        <span className={`inline-block text-xs font-bold px-2.5 py-1 rounded-full mt-1 ${
+                                                                            proposal.status === 'ACCEPTED' ? 'bg-green-100 text-green-700' : 
+                                                                            proposal.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 
+                                                                            'bg-yellow-100 text-yellow-700'
+                                                                        }`}>
+                                                                            {proposal.status}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Cover Letter */}
+                                                                <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                                                    <p className="text-xs font-semibold text-gray-600 mb-1">Cover Letter:</p>
+                                                                    <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{proposal.cover_letter || 'No cover letter provided.'}</p>
+                                                                </div>
+                                                                
+                                                                {/* Action Buttons */}
+                                                                <div className="flex gap-2 mt-3">
+                                                                    <button 
+                                                                        onClick={() => navigate(`/profile/${proposal.worker_id}`)}
+                                                                        className="flex-1 px-3 py-2 border border-blue-200 text-blue-600 text-xs font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+                                                                    >
+                                                                        View Profile
+                                                                    </button>
+                                                                    <button 
+                                                                        onClick={() => handleStartChat(proposal.worker_id)}
+                                                                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-xs font-semibold rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-1"
+                                                                    >
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                                                        </svg>
+                                                                        Chat
+                                                                    </button>
+                                                                    {proposal.status === 'PENDING' && (
+                                                                        <>
+                                                                            <button 
+                                                                                onClick={() => handleAcceptProposal(proposal.id)}
+                                                                                className="flex-1 px-3 py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                                                                            >
+                                                                                Accept Proposal
+                                                                            </button>
+                                                                            <button 
+                                                                                onClick={() => handleRejectProposal(proposal.id)}
+                                                                                className="flex-1 px-3 py-2 border border-red-200 text-red-600 text-xs font-semibold rounded-lg hover:bg-red-50 transition-colors"
+                                                                            >
+                                                                                Reject
+                                                                            </button>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'recommended' && (
+                                        <div className="space-y-4">
+                                            {recommendedWorkers.length === 0 ? (
+                                                <p className="text-gray-500 text-sm italic text-center py-4">
+                                                    No recommendations found. Keep adding skills to your job posting!
+                                                </p>
+                                            ) : (
+                                                recommendedWorkers.map((worker) => (
+                                                    <div key={worker.id} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-r from-blue-50 to-white hover:shadow-sm transition-shadow">
+                                                        <div className="flex justify-between items-start">
+                                                            <div className="flex gap-3">
+                                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+                                                                    {worker.full_name?.charAt(0) || "W"}
+                                                                </div>
+                                                                <div>
+                                                                    <div className="flex items-center gap-2">
+                                                                        <h3 
+                                                                            className="font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                                                                            onClick={() => navigate(`/profile/${worker.id}`)}
+                                                                        >
+                                                                            {worker.full_name}
+                                                                        </h3>
+                                                                        <span className="bg-emerald-100 text-emerald-700 text-[10px] font-bold px-1.5 py-0.5 rounded">
+                                                                            {worker.match_score}% MATCH
+                                                                        </span>
+                                                                    </div>
+                                                                    <p className="text-xs text-gray-600 mt-0.5 line-clamp-1 max-w-md">
+                                                                        {worker.bio || "No bio available"}
+                                                                    </p>
+                                                                    <div className="flex flex-wrap gap-1 mt-2">
+                                                                        <span className="text-xs text-gray-500">
+                                                                            {worker.matching_skills_count}/{worker.total_required_skills} Skills Match
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <p className="font-bold text-gray-900">${worker.hourly_rate || 0}/hr</p>
+                                                                <button 
+                                                                    onClick={() => handleInviteWorker(worker.id)}
+                                                                    className="mt-2 text-xs font-semibold text-blue-600 hover:text-blue-800 border border-blue-200 px-3 py-1 rounded hover:bg-blue-50 transition-colors"
+                                                                >
+                                                                    Invite to Apply
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'checkpoints' && (
+                                        <div className="space-y-6">
+                                            {/* Review Action Banner */}
+                                            {contractDetail && (
+                                                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-6 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-sm">
+                                                    <div className="flex items-start gap-4">
+                                                        <div className="p-3 bg-blue-100 rounded-xl">
+                                                            <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                            </svg>
+                                                        </div>
+                                                        <div>
+                                                            <h3 className="font-bold text-gray-900 text-lg">Manage Checkpoints</h3>
+                                                            <p className="text-gray-600">Review worker submissions, approve work, and release payments.</p>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => navigate(`/task-owner/contracts/${contractDetail.id}/review`)}
+                                                        className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md hover:shadow-lg transform active:scale-95 transition-all"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        Review Submissions
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <div className="space-y-4">
+                                                {(contractDetail?.checkpoints || job.checkpoints) && (contractDetail?.checkpoints || job.checkpoints).length > 0 ? (
+                                                    (contractDetail?.checkpoints || job.checkpoints).map((cp, idx) => {
+                                                        const status = cp.status || 'PENDING';
+                                                        return (
+                                                            <div key={cp.id || idx} className={`border rounded-xl p-5 transition-all ${
+                                                                status === 'APPROVED' ? 'border-green-200 bg-green-50/50' : 
+                                                                status === 'SUBMITTED' ? 'border-yellow-200 bg-yellow-50/50' :
+                                                                'border-gray-200 bg-white hover:border-blue-200 hover:shadow-sm'
+                                                            }`}>
+                                                                <div className="flex justify-between items-start">
+                                                                    <div className="flex gap-4">
+                                                                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm ${
+                                                                            status === 'APPROVED' ? 'bg-green-100 text-green-700' :
+                                                                            status === 'SUBMITTED' ? 'bg-yellow-100 text-yellow-700' :
+                                                                            'bg-gray-100 text-gray-500'
+                                                                        }`}>
+                                                                            {idx + 1}
+                                                                        </div>
+                                                                        <div>
+                                                                            <h3 className="font-bold text-gray-900 text-lg flex items-center gap-2">
+                                                                                {cp.title || `Checkpoint ${idx + 1}`}
+                                                                                {status === 'APPROVED' && <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>}
+                                                                            </h3>
+                                                                            {cp.description && <p className="text-sm text-gray-600 mt-1">{cp.description}</p>}
+                                                                            
+                                                                            <div className="flex gap-4 mt-2">
+                                                                                {cp.due_date && (
+                                                                                    <p className="text-xs text-gray-500 flex items-center gap-1">
+                                                                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                                                                        Due: {new Date(cp.due_date).toLocaleDateString()}
+                                                                                    </p>
+                                                                                )}
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="text-right">
+                                                                        <div className="font-bold text-gray-900 text-xl">${Number(cp.amount).toLocaleString()}</div>
+                                                                        <span className={`inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${
+                                                                            status === 'APPROVED' ? 'bg-green-100 text-green-700' : 
+                                                                            status === 'SUBMITTED' ? 'bg-yellow-100 text-yellow-700' :
+                                                                            'bg-gray-100 text-gray-500'
+                                                                        }`}>
+                                                                            {status}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })
+                                                ) : (
+                                                    <div className="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-300">
+                                                        <p className="text-gray-500 italic">No checkpoints defined for this job.</p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {activeTab === 'contract' && (
+                                        <div>
+                                            {contractDetail ? (
+                                                <div className="space-y-6">
+                                                    {/* Contract Summary */}
+                                                    <div className="flex items-center justify-between">
+                                                        <h3 className="text-lg font-bold text-gray-900">Contract Document</h3>
+                                                        <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
+                                                            <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+                                                            <span className="text-xs font-bold text-blue-700">{contractDetail.status || 'DRAFT'}</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-2 gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
+                                                        <div>
+                                                            <div className="text-xs font-bold text-gray-500 uppercase mb-1">Total Contract Value</div>
+                                                            <div className="text-2xl font-extrabold text-blue-600">${Number(contractDetail.total_amount || 0).toLocaleString()}</div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-xs font-bold text-gray-500 uppercase mb-1">Contract ID</div>
+                                                            <div className="text-lg font-bold text-gray-900">#{contractDetail.id}</div>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Contract Content */}
+                                                    {(contractDetail.contract_content || contractDetail.terms) && (
+                                                        <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
+                                                            {/* Document Header */}
+                                                            <div className="bg-gray-800 text-white px-6 py-4">
+                                                                <div className="flex items-center gap-3">
+                                                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                                    </svg>
+                                                                    <div>
+                                                                        <div className="text-sm font-bold">FAF Platform Employment Contract</div>
+                                                                        <div className="text-xs text-gray-300">Legally binding agreement</div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Document Body */}
+                                                            <div className="bg-white p-8">
+                                                                <div 
+                                                                    className="prose prose-sm max-w-none
+                                                                    prose-headings:font-extrabold prose-headings:text-gray-900 prose-headings:mb-3
+                                                                    prose-h2:text-lg prose-h2:border-b-2 prose-h2:border-gray-200 prose-h2:pb-2 prose-h2:mt-6
+                                                                    prose-h3:text-base prose-h3:text-blue-700 prose-h3:mt-4
+                                                                    prose-p:text-sm prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-3
+                                                                    prose-strong:text-gray-900 prose-strong:font-bold
+                                                                    prose-ul:list-disc prose-ul:ml-6 prose-ul:text-sm prose-ul:text-gray-700
+                                                                    prose-ol:list-decimal prose-ol:ml-6 prose-ol:text-sm prose-ol:text-gray-700"
+                                                                    dangerouslySetInnerHTML={{ 
+                                                                        __html: contractDetail.contract_content || contractDetail.terms 
+                                                                    }}
+                                                                />
+                                                            </div>
+
+                                                            {/* Document Footer */}
+                                                            <div className="bg-gray-50 px-8 py-4 border-t-2 border-gray-200">
+                                                                <div className="flex items-center justify-between text-xs text-gray-500">
+                                                                    <div className="flex items-center gap-2">
+                                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                                                        </svg>
+                                                                        <span className="font-semibold">Secured by FAF Escrow System</span>
+                                                                    </div>
+                                                                    {contractDetail.created_at && (
+                                                                        <span>Created: {new Date(contractDetail.created_at).toLocaleDateString()}</span>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Signature Status Section */}
+                                                    {contractDetail && (
+                                                        <div className="mt-6 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border-2 border-blue-200">
+                                                            <h3 className="text-lg font-bold text-gray-900 mb-4">Contract Signatures</h3>
+                                                            
+                                                            <div className="grid grid-cols-2 gap-4 mb-6">
+                                                                {/* Worker Signature */}
+                                                                <div className={`p-4 rounded-lg ${
+                                                                    contractDetail.signature_worker 
+                                                                        ? 'bg-green-50 border-2 border-green-300' 
+                                                                        : 'bg-gray-50 border-2 border-gray-300'
+                                                                }`}>
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        {contractDetail.signature_worker ? (
+                                                                            <div className="p-2 bg-green-100 rounded-lg">
+                                                                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                                </svg>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="p-2 bg-gray-100 rounded-lg">
+                                                                                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                </svg>
+                                                                            </div>
+                                                                        )}
+                                                                        <div>
+                                                                            <p className="font-semibold text-gray-900">Worker</p>
+                                                                            <p className="text-sm text-gray-600">{contractDetail.worker_name || 'Unknown'}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <p className={`text-sm font-bold ${
+                                                                        contractDetail.signature_worker 
+                                                                            ? 'text-green-700' 
+                                                                            : 'text-gray-500'
+                                                                    }`}>
+                                                                        {contractDetail.signature_worker ? 'Signed' : 'Pending'}
+                                                                    </p>
+                                                                    {contractDetail.worker_signed_at && (
+                                                                        <p className="text-xs text-gray-500 mt-1">
+                                                                            {new Date(contractDetail.worker_signed_at).toLocaleString()}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+
+                                                                {/* Employer Signature */}
+                                                                <div className={`p-4 rounded-lg ${
+                                                                    contractDetail.signature_client 
+                                                                        ? 'bg-green-50 border-2 border-green-300' 
+                                                                        : 'bg-yellow-50 border-2 border-yellow-300'
+                                                                }`}>
+                                                                    <div className="flex items-center gap-2 mb-2">
+                                                                        {contractDetail.signature_client ? (
+                                                                            <div className="p-2 bg-green-100 rounded-lg">
+                                                                                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                                                </svg>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="p-2 bg-yellow-100 rounded-lg">
+                                                                                <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                </svg>
+                                                                            </div>
+                                                                        )}
+                                                                        <div>
+                                                                            <p className="font-semibold text-gray-900">You (Employer)</p>
+                                                                            <p className="text-sm text-gray-600">{contractDetail.client_name || 'You'}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <p className={`text-sm font-bold ${
+                                                                        contractDetail.signature_client 
+                                                                            ? 'text-green-700' 
+                                                                            : 'text-yellow-700'
+                                                                    }`}>
+                                                                        {contractDetail.signature_client ? 'Signed' : 'Pending Your Signature'}
+                                                                    </p>
+                                                                    {contractDetail.client_signed_at && (
+                                                                        <p className="text-xs text-gray-500 mt-1">
+                                                                            {new Date(contractDetail.client_signed_at).toLocaleString()}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Action Buttons */}
+                                                            {!contractDetail.signature_client && contractDetail.signature_worker && (
+                                                                <div className="bg-white p-4 rounded-lg border-2 border-blue-300">
+                                                                    <div className="flex items-start gap-3 mb-3">
+                                                                        <div className="flex-shrink-0 p-2 bg-blue-100 rounded-lg">
+                                                                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div className="flex-1">
+                                                                            <p className="font-bold text-gray-900 mb-1">Ready for Your Signature</p>
+                                                                            <p className="text-sm text-gray-600">
+                                                                                The worker has signed the contract. Please review and sign to activate the job.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <button
+                                                                        onClick={() => navigate(`/task-owner/contract/${contractDetail.id}/sign`)}
+                                                                        className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                                                                    >
+                                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                                        </svg>
+                                                                        Review & Sign Contract
+                                                                    </button>
+                                                                </div>
+                                                            )}
+
+                                                            {!contractDetail.signature_worker && (
+                                                                <div className="bg-yellow-50 p-4 rounded-lg border-2 border-yellow-300">
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="flex-shrink-0 p-2 bg-yellow-100 rounded-lg">
+                                                                            <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="font-bold text-yellow-900 mb-1">Waiting for Worker Signature</p>
+                                                                            <p className="text-sm text-yellow-800">
+                                                                                The worker needs to review and sign this contract before you can sign it.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {contractDetail.signature_client && contractDetail.signature_worker && (
+                                                                <div className="bg-green-50 p-4 rounded-lg border-2 border-green-300">
+                                                                    <div className="flex items-start gap-3">
+                                                                        <div className="flex-shrink-0 p-2 bg-green-100 rounded-lg">
+                                                                            <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                            </svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <p className="font-bold text-green-900 mb-1">Contract Fully Signed!</p>
+                                                                            <p className="text-sm text-green-800">
+                                                                                Both parties have signed. The contract is now active and work can begin.
+                                                                            </p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <p className="text-gray-500 text-sm italic">No contract created yet.</p>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
                             </section>
                         </div>
@@ -426,30 +704,26 @@ const JobDetail = () => {
                         <div className="space-y-6">
                             <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
                                 <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                                    Budget summary
+                                    Job Details
                                 </h2>
-                                <div className="flex items-baseline gap-2 mb-4">
-                                    <span className="text-2xl font-bold text-gray-900">
-                                        ${job.budget.toLocaleString()}
-                                    </span>
-                                    <span className="text-xs text-gray-500">total points</span>
-                                </div>
-                                <p className="text-xs text-gray-500">
-                                    This is a demo view using mock data only (no API yet).
-                                </p>
-                            </section>
-
-                            <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
-                                <h2 className="text-sm font-semibold text-gray-900 mb-3">
-                                    Quick actions
-                                </h2>
-                                <div className="space-y-3">
-                                    <button className="w-full px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition-colors">
-                                        Edit job (coming soon)
-                                    </button>
-                                    <button className="w-full px-4 py-2 rounded-lg border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
-                                        View proposals (mock)
-                                    </button>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between">
+                                        <span className="font-medium">{job.job_type}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Duration</span>
+                                        <span className="font-medium text-right">
+                                            {job.start_date ? new Date(job.start_date).toLocaleDateString() : 'ASAP'} - {job.end_date ? new Date(job.end_date).toLocaleDateString() : 'Open'}
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Budget</span>
+                                        <span className="font-medium">${Number(job.budget).toLocaleString()}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-gray-600">Status</span>
+                                        <span className="font-medium">{job.status}</span>
+                                    </div>
                                 </div>
                             </section>
                         </div>
