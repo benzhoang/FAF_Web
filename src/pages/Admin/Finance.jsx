@@ -89,9 +89,9 @@ const Finance = () => {
                         </div>
                     </div>
 
-                    {/* Middle section: Summary + Urgent attention (không có biểu đồ) */}
+                    {/* Middle section: Summary + Urgent attention */}
                     <div className="mb-6 grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-                        {/* Points movement summary (text only) */}
+                        {/* Points movement summary with chart */}
                         <div className="rounded-2xl bg-white p-5 shadow-sm border border-gray-200 flex flex-col justify-between">
                             <div className="flex items-start justify-between gap-4">
                                 <div>
@@ -103,6 +103,106 @@ const Finance = () => {
                                 <button className="text-xs font-medium text-blue-600 hover:text-blue-700">
                                     Full report &rarr;
                                 </button>
+                            </div>
+
+                            {/* Line chart giống hình minh họa */}
+                            <div className="mt-4 rounded-xl bg-[#020617] px-4 pt-4 pb-3 border border-slate-800">
+                                <div className="mb-3 flex items-center justify-between text-[11px] text-slate-400">
+                                    <span>Points movement</span>
+                                    <div className="flex items-center gap-3">
+                                        <span className="inline-flex items-center gap-1">
+                                            <span className="h-1 w-5 rounded-full bg-emerald-400" />
+                                            <span>Inflow</span>
+                                        </span>
+                                        <span className="inline-flex items-center gap-1">
+                                            <span className="h-1 w-5 rounded-full border border-slate-500 border-dashed" />
+                                            <span>Outflow</span>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="h-32">
+                                    <svg viewBox="0 0 400 140" className="h-full w-full">
+                                        {/* gradient fill */}
+                                        <defs>
+                                            <linearGradient id="pointsArea" x1="0" x2="0" y1="0" y2="1">
+                                                <stop offset="0%" stopColor="#22c55e" stopOpacity="0.25" />
+                                                <stop offset="100%" stopColor="#22c55e" stopOpacity="0" />
+                                            </linearGradient>
+                                        </defs>
+
+                                        {/* area under main line */}
+                                        <path
+                                            d="M0 90 C 60 60, 110 70, 160 45 C 210 80, 260 70, 310 95 C 350 120, 380 70, 400 40 L 400 140 L 0 140 Z"
+                                            fill="url(#pointsArea)"
+                                        />
+
+                                        {/* dashed comparison line */}
+                                        <path
+                                            d="M0 100 C 60 85, 110 88, 160 75 C 210 95, 260 90, 310 100 C 350 110, 380 95, 400 85"
+                                            fill="none"
+                                            stroke="#4b5563"
+                                            strokeWidth="2"
+                                            strokeDasharray="6 6"
+                                            strokeLinecap="round"
+                                        />
+
+                                        {/* main teal line */}
+                                        <path
+                                            d="M0 90 C 60 60, 110 70, 160 45 C 210 80, 260 70, 310 95 C 350 120, 380 70, 400 40"
+                                            fill="none"
+                                            stroke="#22c55e"
+                                            strokeWidth="3"
+                                            strokeLinecap="round"
+                                        />
+
+                                        {/* vertical hover line + tooltip point (May 16) */}
+                                        <g>
+                                            {/* x ≈ 160 (giữa biểu đồ) */}
+                                            <line
+                                                x1="160"
+                                                y1="20"
+                                                x2="160"
+                                                y2="130"
+                                                stroke="#1e293b"
+                                                strokeWidth="1"
+                                                strokeDasharray="4 4"
+                                            />
+                                            <circle cx="160" cy="45" r="4.5" fill="#22c55e" />
+
+                                            {/* tooltip box */}
+                                            <g transform="translate(190,30)">
+                                                <rect
+                                                    x="-55"
+                                                    y="-18"
+                                                    width="110"
+                                                    height="32"
+                                                    rx="6"
+                                                    fill="#020617"
+                                                    stroke="#0f172a"
+                                                />
+                                                <text
+                                                    x="0"
+                                                    y="-4"
+                                                    textAnchor="middle"
+                                                    fontSize="10"
+                                                    fill="#e5e7eb"
+                                                >
+                                                    May 16
+                                                </text>
+                                                <text
+                                                    x="0"
+                                                    y="8"
+                                                    textAnchor="middle"
+                                                    fontSize="9"
+                                                    fill="#22c55e"
+                                                >
+                                                    +22,400 pts
+                                                </text>
+                                            </g>
+                                        </g>
+                                    </svg>
+                                </div>
                             </div>
 
                             <div className="mt-4 grid gap-4 sm:grid-cols-3">

@@ -45,6 +45,10 @@ import Notifications from "./pages/Notifications";
 import { ChatProvider } from "./contexts/ChatContext";
 import ChatWidget from "./components/Chat/ChatWidget";
 import "./App.css";
+import Manager from "./pages/Manager/Request";
+import EmployeeManagement from "./pages/Manager/EmployeeManagement";
+import RequestDetail from "./pages/Manager/RequestDetail";
+import Finances from "./pages/Manager/Finances";
 
 function App() {
   return (
@@ -297,12 +301,43 @@ function App() {
 
       {/* ========== OTHER ROUTES ========== */}
       <Route path="/job-list" element={<JobListPage />} />
-
       <Route
         path="/profile/:id"
         element={
           <ProtectedRoute roles={["worker", "employer", "admin"]}>
             <PublicProfile />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ========== MANAGER ROUTES ========== */}
+      <Route
+        path="/manager/request"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <Manager />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/manager/request/:id"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <RequestDetail />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/manager/employees"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <EmployeeManagement />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/manager/finances"
+        element={
+          <ProtectedRoute roles={["manager"]}>
+            <Finances />
           </ProtectedRoute>
         }
       />

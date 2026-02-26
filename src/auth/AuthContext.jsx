@@ -42,6 +42,8 @@ export const AuthProvider = ({ children }) => {
         return "/task-owner";
       case "worker":
         return "/";
+      case "manager":
+        return "/manager/request";
       default:
         return "/";
     }

@@ -14,20 +14,20 @@ const Signin = () => {
   const navigate = useNavigate();
 
   // Tài khoản giả
-//   const fakeAccounts = {
-//     worker: {
-//       email: "worker@faf.com",
-//       password: "password123",
-//       role: "worker",
-//       redirect: "/",
-//     },
-//     taskOwner: {
-//       email: "owner@faf.com",
-//       password: "password123",
-//       role: "taskOwner",
-//       redirect: "/task-owner",
-//     },
-//   };
+  //   const fakeAccounts = {
+  //     worker: {
+  //       email: "worker@faf.com",
+  //       password: "password123",
+  //       role: "worker",
+  //       redirect: "/",
+  //     },
+  //     taskOwner: {
+  //       email: "owner@faf.com",
+  //       password: "password123",
+  //       role: "taskOwner",
+  //       redirect: "/task-owner",
+  //     },
+  //   };
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
