@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import { chatApi } from '../api/chat.api';
+import { notificationApi } from '../api/notification.api';
 import { useAuth } from '../auth/AuthContext';
 import { useToast } from './ToastContext';
 
@@ -10,6 +11,7 @@ const SOCKET_SERVER_URL = import.meta.env.VITE_SOCKET_URL ||
 
 const ChatContext = createContext();
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useChatContext = () => {
     const context = useContext(ChatContext);
     if (!context) {
@@ -24,7 +26,8 @@ export const ChatProvider = ({ children }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [activeConvId, setActiveConvId] = useState(null);
     const [minimized, setMinimized] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
+    const [unreadCount, setUnreadCount] = useState(0); // For messages
+    const [unreadNotifications, setUnreadNotifications] = useState(0); // For system notifications
     const socketRef = useRef(null);
 
     // Persist activeConvId in a ref for the socket listener
@@ -68,7 +71,32 @@ export const ChatProvider = ({ children }) => {
             socketRef.current.on('new_notification', (notification) => {
                 // Show toast for system notifications
                 toast.success(`${notification.title}: ${notification.message}`, 5000);
+                setUnreadNotifications(prev => prev + 1);
             });
+
+            // Fetch initial counts
+            const fetchInitialCounts = async () => {
+                try {
+                    const [chatRes, notifRes] = await Promise.all([
+                        chatApi.getConversations(),
+                        notificationApi.getNotifications()
+                    ]);
+                    
+                    if (chatRes?.data) {
+                        const totalUnreadMsg = chatRes.data.reduce((sum, conv) => sum + (conv.unread_count || 0), 0);
+                        setUnreadCount(totalUnreadMsg);
+                    }
+
+                    if (notifRes?.data) {
+                        const unreadNotifs = notifRes.data.filter(n => !n.is_read).length;
+                        setUnreadNotifications(unreadNotifs);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch initial unread counts:", error);
+                }
+            };
+
+            fetchInitialCounts();
         }
 
 
@@ -102,21 +130,25 @@ export const ChatProvider = ({ children }) => {
         setActiveConvId(null);
     }, []);
 
+    // eslint-disable-next-line react-hooks/refs
     const value = {
         isOpen,
         activeConvId,
         minimized,
         unreadCount,
+        unreadNotifications,
         socket: socketRef.current,
         setIsOpen,
         setActiveConvId,
         setMinimized,
         setUnreadCount,
+        setUnreadNotifications,
         openChat,
         toggleChat,
         closeChat
     };
 
+    // eslint-disable-next-line react-hooks/refs
     return (
         <ChatContext.Provider value={value}>
             {children}

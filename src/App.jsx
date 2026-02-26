@@ -10,6 +10,7 @@ import Success from "./pages/Worker/Apply/Success";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 import ActiveJob from "./pages/Worker/ActiveJob";
 import ContractSign from "./pages/Worker/ContractSign";
+import ContractDetail from "./pages/Worker/ContractDetail";
 import Settings from "./pages/Worker/Settings";
 import Wallet from "./pages/Worker/Wallet";
 import Depositpoint from "./pages/Worker/Depositpoint";
@@ -109,6 +110,14 @@ function App() {
         element={
           <ProtectedRoute roles={["worker", "employer", "admin"]}>
             <PublicLayout><ContractSign /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/contract/:id/view"
+        element={
+          <ProtectedRoute roles={["worker", "employer", "admin"]}>
+            <PublicLayout><ContractDetail /></PublicLayout>
           </ProtectedRoute>
         }
       />

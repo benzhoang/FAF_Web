@@ -4,7 +4,11 @@ import { useToast } from '../../contexts/ToastContext';
 import { matchingApi } from '../../api/matching.api';
 import { proposalsApi } from '../../api/proposals.api';
 import { contractsApi } from '../../api/contracts.api';
-import warehouseImg from '../../assets/istockphoto-1947499362-612x612.jpg'
+import { reviewsApi } from '../../api/reviews.api';
+import warehouseImg from '../../assets/istockphoto-1947499362-612x612.jpg';
+import StatCard from './components/StatCard';
+import JobTable from './components/JobTable';
+import ReviewsList from './components/ReviewsList';
 
 const WorkerDashboard = () => {
     const navigate = useNavigate();
@@ -16,6 +20,9 @@ const WorkerDashboard = () => {
     const [loading, setLoading] = useState(true);
     const [proposalsLoading, setProposalsLoading] = useState(true);
     const [contractLoading, setContractLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState('overview');
+    const [reviewsData, setReviewsData] = useState({ reviews: [], summary: null });
+    const [reviewsLoading, setReviewsLoading] = useState(true);
 
     const todayGreeting = useMemo(() => {
         const hour = new Date().getHours()
@@ -90,9 +97,25 @@ const WorkerDashboard = () => {
             }
         };
         
+        const fetchReviews = async () => {
+            try {
+                setReviewsLoading(true);
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                if (user.id) {
+                    const res = await reviewsApi.getUserReviews(user.id);
+                    setReviewsData({ reviews: res.data || [], summary: res.summary || null });
+                }
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            } finally {
+                setReviewsLoading(false);
+            }
+        };
+
         fetchRecommendations();
         fetchMyProposals();
         fetchContracts();
+        fetchReviews();
     }, []);
 
     return (
@@ -145,50 +168,51 @@ const WorkerDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Statistics Section */}
-                            {!contractLoading && (
-                                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg">
-                                        <p className="text-blue-100 text-xs font-bold uppercase tracking-wider mb-1">Total Earned</p>
-                                        <h3 className="text-2xl font-black">
-                                            ${allContracts
-                                                .filter(c => c.status === 'COMPLETED')
-                                                .reduce((sum, c) => sum + Number(c.total_amount || 0), 0)
-                                                .toLocaleString()}
-                                        </h3>
-                                        <div className="mt-2 text-[10px] bg-white/20 rounded px-2 py-1 inline-block">
-                                            Lifetime Earnings
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="bg-white border-2 border-green-100 rounded-2xl p-5 shadow-sm">
-                                        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Success Rate</p>
-                                        <h3 className="text-2xl font-black text-gray-900">
-                                            {allContracts.length > 0 
-                                                ? Math.round((allContracts.filter(c => c.status === 'COMPLETED').length / allContracts.filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status)).length || 1) * 100) 
-                                                : 100}%
-                                        </h3>
-                                        <div className="mt-2 flex items-center gap-1">
-                                            <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                                                <div 
-                                                    className="bg-green-500 h-full rounded-full" 
-                                                    style={{ width: `${allContracts.length > 0 ? (allContracts.filter(c => c.status === 'COMPLETED').length / (allContracts.filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status)).length || 1)) * 100 : 100}%` }}
+                            {/* Tabs Navigation */}
+                            <div className="mt-8 border-b border-gray-200">
+                                <nav className="-mb-px flex space-x-8">
+                                    {['overview', 'jobs', 'reviews'].map((tab) => (
+                                        <button
+                                            key={tab}
+                                            onClick={() => setActiveTab(tab)}
+                                            className={`whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm transition-colors ${
+                                                activeTab === tab
+                                                ? 'border-blue-600 text-blue-600'
+                                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                            }`}
+                                        >
+                                            {tab === 'overview' ? 'Overview' : tab === 'jobs' ? 'My Jobs & History' : 'Ratings & Reviews'}
+                                        </button>
+                                    ))}
+                                </nav>
+                            </div>
+
+                            <div className="mt-6">
+                                {activeTab === 'overview' && (
+                                    <>
+                                        {/* Statistics Section using StatCard */}
+                                        {!contractLoading && (
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <StatCard 
+                                                    title="Total Earned" 
+                                                    value={`$${allContracts.filter(c => c.status === 'COMPLETED').reduce((sum, c) => sum + Number(c.total_amount || 0), 0).toLocaleString()}`} 
+                                                    subtitle="Lifetime Earnings" 
+                                                    bgColor="bg-gradient-to-br from-blue-500 to-indigo-600" 
+                                                    valueColor="text-white"
+                                                    border="border-transparent"
+                                                />
+                                                <StatCard 
+                                                    title="Success Rate" 
+                                                    value={`${allContracts.length > 0 ? Math.round((allContracts.filter(c => c.status === 'COMPLETED').length / (allContracts.filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status)).length || 1)) * 100) : 100}%`} 
+                                                    progress={allContracts.length > 0 ? (allContracts.filter(c => c.status === 'COMPLETED').length / (allContracts.filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status)).length || 1)) * 100 : 100}
+                                                />
+                                                <StatCard 
+                                                    title="Jobs Completed" 
+                                                    value={allContracts.filter(c => c.status === 'COMPLETED').length} 
+                                                    subtitle={`${allContracts.filter(c => c.status === 'ACTIVE').length} currently active`}
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="bg-white border-2 border-blue-100 rounded-2xl p-5 shadow-sm">
-                                        <p className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-1">Jobs Completed</p>
-                                        <h3 className="text-2xl font-black text-gray-900">
-                                            {allContracts.filter(c => c.status === 'COMPLETED').length}
-                                        </h3>
-                                        <p className="mt-2 text-[10px] text-gray-400 font-semibold italic">
-                                            {allContracts.filter(c => c.status === 'ACTIVE').length} currently active
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                                        )}
 
 
                             {/* Active Contract Card */}
@@ -344,6 +368,7 @@ const WorkerDashboard = () => {
                                                                             else navigate('/my-job');
                                                                         }
                                                                     } catch (error) {
+                                                                        console.error(error);
                                                                         toast.error('Failed to load contract.');
                                                                     }
                                                                 }}
@@ -379,58 +404,7 @@ const WorkerDashboard = () => {
                                 </div>
                             </div>
 
-                            {/* Work History Section */}
-                            <div className="mt-8">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-sm font-bold text-gray-900">Work History</h2>
-                                    <span className="text-xs text-gray-500 font-medium italic">Completed & Cancelled jobs</span>
-                                </div>
-                                
-                                <div className="space-y-3">
-                                    {contractLoading ? (
-                                        <p className="text-center py-6 text-gray-500 text-sm">Loading history...</p>
-                                    ) : allContracts.filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status)).length === 0 ? (
-                                        <p className="text-center py-6 text-gray-400 text-xs italic bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                            Your work history will appear here.
-                                        </p>
-                                    ) : (
-                                        allContracts
-                                            .filter(c => ['COMPLETED', 'CANCELLED'].includes(c.status))
-                                            .sort((a, b) => new Date(b.updated_at || b.created_at) - new Date(a.updated_at || a.created_at))
-                                            .slice(0, 5)
-                                            .map((contract) => (
-                                                <div key={contract.id} className="group border border-gray-100 rounded-xl p-4 bg-white hover:border-blue-200 transition-all shadow-sm">
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="min-w-0 flex-1">
-                                                            <div className="flex items-center gap-2 mb-1">
-                                                                <h3 className="font-bold text-gray-900 truncate">{contract.job_title}</h3>
-                                                                <span className={`text-[10px] font-black px-1.5 py-0.5 rounded uppercase ${
-                                                                    contract.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                                                                }`}>
-                                                                    {contract.status}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex items-center gap-3 text-xs text-gray-500">
-                                                                <span>Employer: {contract.client_name || 'FAF User'}</span>
-                                                                <span>•</span>
-                                                                <span>{new Date(contract.updated_at || contract.created_at).toLocaleDateString()}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-right ml-4">
-                                                            <p className="font-bold text-gray-900">${Number(contract.total_amount || 0).toLocaleString()}</p>
-                                                            <button 
-                                                                onClick={() => navigate(`/contract/${contract.id}/view`)}
-                                                                className="mt-1 text-[10px] font-bold text-blue-600 hover:underline"
-                                                            >
-                                                                View Details
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))
-                                    )}
-                                </div>
-                            </div>
+
 
                             <div className="mt-8">
                                 <div className="flex items-center justify-between">
@@ -532,6 +506,38 @@ const WorkerDashboard = () => {
                                         ))
                                     )}
                                 </div>
+                            </div>
+                                    </>
+                                )}
+
+                                {activeTab === 'jobs' && (
+                                    <div className="pt-4 animate-fadeIn">
+                                        <div className="flex items-center justify-between mb-6">
+                                            <h2 className="text-xl font-bold text-gray-900">My Jobs & History</h2>
+                                            <button 
+                                                onClick={() => navigate('/find-work')}
+                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors"
+                                            >
+                                                Find Work
+                                            </button>
+                                        </div>
+                                        {contractLoading ? (
+                                            <p className="text-gray-500 text-center py-10">Loading jobs...</p>
+                                        ) : (
+                                            <JobTable contracts={allContracts} />
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 'reviews' && (
+                                    <div className="pt-4 animate-fadeIn">
+                                        {reviewsLoading ? (
+                                            <p className="text-gray-500 text-center py-10">Loading reviews...</p>
+                                        ) : (
+                                            <ReviewsList reviews={reviewsData.reviews} summary={reviewsData.summary} />
+                                        )}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </section>
