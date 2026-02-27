@@ -13,6 +13,28 @@ const EmployerContractSign = () => {
     const [signing, setSigning] = useState(false);
     const [agreed, setAgreed] = useState(false);
     const [showConfirm, setShowConfirm] = useState(false);
+    const [otp, setOtp] = useState('');
+    const [otpSent, setOtpSent] = useState(false);
+    const [countdown, setCountdown] = useState(0);
+
+    useEffect(() => {
+        let timer;
+        if (countdown > 0) {
+            timer = setInterval(() => setCountdown(c => c - 1), 1000);
+        }
+        return () => clearInterval(timer);
+    }, [countdown]);
+
+    const handleRequestOtp = async () => {
+        try {
+            await contractsApi.requestSignOtp(id);
+            setOtpSent(true);
+            setCountdown(60);
+            toast.success('Mã OTP đã được gửi đến email của bạn');
+        } catch (error) {
+            toast.error('Không thể gửi mã OTP. Vui lòng thử lại.');
+        }
+    };
 
     useEffect(() => {
         fetchContract();
@@ -32,13 +54,18 @@ const EmployerContractSign = () => {
 
     const handleSign = async () => {
         if (!agreed) {
-            toast.warning('Please agree to the contract terms first');
+            toast.warning('Vui lòng đồng ý với các điều khoản trước khi ký');
+            return;
+        }
+
+        if (!otp) {
+            toast.warning('Vui lòng nhập mã OTP để xác nhận ký kết');
             return;
         }
 
         try {
             setSigning(true);
-            await contractsApi.signContract(id);
+            await contractsApi.signContract(id, otp);
             toast.success('Contract signed successfully!');
             setShowConfirm(false);
             navigate('/task-owner');
@@ -447,12 +474,34 @@ const EmployerContractSign = () => {
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Contract Signature</h3>
+                                <h3 className="text-xl font-bold text-gray-900 mb-2">Xác nhận ký hợp đồng</h3>
                                 <p className="text-gray-700 text-sm">
-                                    Are you sure you want to sign this contract? This action cannot be undone and commits you to the agreed terms.
+                                    Để hoàn tất, vui lòng nhập mã OTP được gửi đến email của bạn. Hành động này không thể hoàn tác.
                                 </p>
                             </div>
                         </div>
+
+                        <div className="mb-6">
+                            <label className="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mã xác thực OTP</label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    placeholder="••••••"
+                                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 text-center text-xl font-mono tracking-[0.5em] transition-all outline-none"
+                                    maxLength={6}
+                                />
+                                <button
+                                    onClick={handleRequestOtp}
+                                    disabled={countdown > 0}
+                                    className="px-4 py-2 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 text-xs min-w-[120px]"
+                                >
+                                    {countdown > 0 ? `${countdown}s` : otpSent ? 'Gửi lại' : 'Nhận mã'}
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="flex gap-3">
                             <button
                                 onClick={() => setShowConfirm(false)}

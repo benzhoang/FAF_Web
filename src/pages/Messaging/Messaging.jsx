@@ -66,9 +66,9 @@ const Messaging = () => {
     return (
         <div className="flex h-[calc(100vh-80px)] bg-gray-50 overflow-hidden">
             {/* Sidebar: Conversations */}
-            <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-                <div className="p-4 border-b border-gray-200">
-                    <h2 className="text-xl font-bold text-gray-800">Messages</h2>
+            <div className="w-80 bg-white/95 backdrop-blur-md border-r border-gray-100 flex flex-col shadow-[2px_0_10px_-3px_rgba(0,0,0,0.05)] z-20">
+                <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                    <h2 className="text-xl font-black text-gray-900 tracking-tight">Messages</h2>
                 </div>
                 <div className="flex-1 overflow-y-auto">
                     {conversations.length === 0 ? (
@@ -80,18 +80,28 @@ const Messaging = () => {
                             <button
                                 key={conv.id}
                                 onClick={() => setSelectedConvId(conv.id)}
-                                className={`w-full p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100 ${
-                                    String(selectedConvId) === String(conv.id) ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                                className={`w-[calc(100%-16px)] mx-2 my-1 p-3 flex items-center gap-3 rounded-2xl transition-all ${
+                                    String(selectedConvId) === String(conv.id) 
+                                    ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' 
+                                    : 'hover:bg-gray-50 bg-transparent'
                                 }`}
                             >
-                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold shrink-0 ${
+                                    String(selectedConvId) === String(conv.id)
+                                    ? 'bg-white/20 text-white'
+                                    : 'bg-blue-100 text-blue-600'
+                                }`}>
                                     {conv.other_user_avatar}
                                 </div>
                                 <div className="text-left overflow-hidden">
-                                    <h4 className="font-semibold text-gray-900 truncate">
+                                    <h4 className={`font-semibold truncate ${
+                                        String(selectedConvId) === String(conv.id) ? 'text-white' : 'text-gray-900'
+                                    }`}>
                                         {conv.other_user_name}
                                     </h4>
-                                    <p className="text-xs text-gray-500 truncate mt-0.5">
+                                    <p className={`text-xs truncate mt-0.5 font-medium ${
+                                        String(selectedConvId) === String(conv.id) ? 'text-blue-100' : 'text-gray-500'
+                                    }`}>
                                         {conv.last_message || 'Start chatting...'}
                                     </p>
                                 </div>
@@ -106,13 +116,13 @@ const Messaging = () => {
                 {selectedConvId ? (
                     <>
                         {/* Chat Header */}
-                        <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                        <div className="p-4 sm:px-6 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-[0_2px_10px_-3px_rgba(0,0,0,0.05)] sticky top-0 z-10 flex items-center gap-4">
+                            <div className="w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg shadow-sm border border-white">
                                 {selectedConv?.other_user_name?.charAt(0) || '?'}
                             </div>
                             <div>
-                                <h3 className="font-bold text-gray-900">{selectedConv?.other_user_name}</h3>
-                                <p className="text-xs text-green-500 font-medium">Online</p>
+                                <h3 className="font-bold text-gray-900 text-lg">{selectedConv?.other_user_name}</h3>
+                                <p className="text-xs text-green-500 font-bold flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-green-500"></span> Online</p>
                             </div>
                         </div>
 
@@ -139,13 +149,13 @@ const Messaging = () => {
                                             key={msg.id || i} 
                                             className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
                                         >
-                                            <div className={`max-w-[70%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
+                                            <div className={`max-w-[75%] px-5 py-3 rounded-[1.25rem] text-[15px] ${
                                                 isMe 
-                                                    ? 'bg-blue-600 text-white rounded-tr-none' 
-                                                    : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                                                    ? 'bg-gradient-to-tr from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 rounded-br-sm' 
+                                                    : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-bl-sm'
                                             }`}>
-                                                <p>{msg.content}</p>
-                                                <div className={`text-[10px] mt-1 ${isMe ? 'text-blue-100 text-right' : 'text-gray-400'}`}>
+                                                <p className="leading-relaxed">{msg.content}</p>
+                                                <div className={`text-[10px] mt-1.5 font-bold ${isMe ? 'text-blue-200 text-right' : 'text-gray-400'}`}>
                                                     {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                 </div>
                                             </div>
@@ -157,20 +167,24 @@ const Messaging = () => {
                         </div>
 
                         {/* Input Area */}
-                        <form onSubmit={handleSend} className="p-4 border-t border-gray-200 flex gap-2">
-                            <input
-                                type="text"
-                                value={messageInput}
-                                onChange={(e) => setMessageInput(e.target.value)}
-                                placeholder="Type a message..."
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                            />
+                        <form onSubmit={handleSend} className="p-4 sm:p-5 bg-white border-t border-gray-100 flex gap-3 items-center z-10">
+                            <div className="flex-1 bg-gray-50/50 hover:bg-white border border-gray-200 rounded-full transition-all focus-within:bg-white focus-within:ring-4 focus-within:ring-blue-500/10 focus-within:border-blue-500 flex items-center px-5 py-3 shadow-sm">
+                                <input
+                                    type="text"
+                                    value={messageInput}
+                                    onChange={(e) => setMessageInput(e.target.value)}
+                                    placeholder="Type your message..."
+                                    className="w-full bg-transparent outline-none text-[15px] font-medium text-gray-900 placeholder:text-gray-400"
+                                />
+                            </div>
                             <button
                                 type="submit"
                                 disabled={!messageInput.trim()}
-                                className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="w-12 h-12 shrink-0 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white flex items-center justify-center hover:from-blue-500 hover:to-indigo-500 shadow-md shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                             >
-                                <span className="text-lg">➔</span>
+                                <svg className="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                </svg>
                             </button>
                         </form>
                     </>

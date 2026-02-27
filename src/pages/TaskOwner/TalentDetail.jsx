@@ -670,12 +670,12 @@ const TalentDetail = () => {
                                     Top skills
                                 </h2>
                                 <div className="flex flex-wrap gap-2">
-                                    {worker.topSkills.map((skill) => (
+                                    {worker.topSkills?.map((skill, index) => (
                                         <span
-                                            key={skill}
+                                            key={typeof skill === 'string' ? skill : skill.id || index}
                                             className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800"
                                         >
-                                            {skill}
+                                            {typeof skill === 'string' ? skill : skill.name || skill.id}
                                         </span>
                                     ))}
                                 </div>

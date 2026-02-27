@@ -112,7 +112,7 @@ const JobDetail = () => {
 
             <div className="flex-1 flex flex-col">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4">
+                <header className="bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 sm:px-10 py-6 sticky top-0 z-20 shadow-sm">
                     <div className="flex items-center justify-between gap-4">
                         <div>
                             <button
@@ -121,7 +121,7 @@ const JobDetail = () => {
                             >
                                 <span className="mr-1">←</span> Back to My Jobs
                             </button>
-                            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+                            <h1 className="text-3xl font-black text-gray-900 tracking-tight">{job.title}</h1>
                             <p className="text-sm text-gray-600 mt-1">
                                 {job.category_name} • {new Date(job.created_at).toLocaleDateString()}
                             </p>
@@ -130,7 +130,7 @@ const JobDetail = () => {
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => navigate(`/task-owner/jobs/${job.id}/edit`)}
-                                    className="px-3 py-1.5 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                    className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 font-bold text-white text-xs rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all shadow-md shadow-blue-500/20"
                                 >
                                     Edit Job
                                 </button>
@@ -163,7 +163,7 @@ const JobDetail = () => {
                         {/* Left: job details */}
                         <div className="lg:col-span-2 space-y-6">
                             {/* Overview */}
-                            <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                            <section className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow">
                                 <h2 className="text-lg font-semibold text-gray-900 mb-3">
                                     Description
                                 </h2>
@@ -174,7 +174,7 @@ const JobDetail = () => {
 
                             {/* Skills */}
                             {job.skills && job.skills.length > 0 && (
-                                <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                                <section className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow">
                                     <h2 className="text-lg font-semibold text-gray-900 mb-3">
                                         Skills Required
                                     </h2>
@@ -192,8 +192,8 @@ const JobDetail = () => {
                             )}
 
                             {/* Tabs Section */}
-                            <section className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                                <div className="border-b border-gray-200 flex overflow-x-auto">
+                            <section className="bg-white rounded-[2rem] border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+                                <div className="border-b border-gray-100 flex overflow-x-auto">
                                     {['proposals', 'recommended', 'checkpoints', 'contract'].map((tab) => (
                                         <button
                                             key={tab}
@@ -211,14 +211,14 @@ const JobDetail = () => {
                                     ))}
                                 </div>
                                 
-                                <div className="p-6">
+                                <div className="p-8">
                                     {activeTab === 'proposals' && (
                                         <div className="space-y-4">
                                             {proposals.length === 0 ? (
                                                 <p className="text-gray-500 text-sm italic">No proposals yet.</p>
                                             ) : (
                                                 proposals.map((proposal) => (
-                                                    <div key={proposal.id} className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
+                                                    <div key={proposal.id} className="border border-gray-100 rounded-2xl p-5 bg-white hover:shadow-md transition-all group">
                                                         <div className="flex gap-4 mb-3">
                                                             {/* Worker Avatar */}
                                                             <div 
@@ -279,8 +279,8 @@ const JobDetail = () => {
                                                                 </div>
 
                                                                 {/* Cover Letter */}
-                                                                <div className="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                                                    <p className="text-xs font-semibold text-gray-600 mb-1">Cover Letter:</p>
+                                                                <div className="mt-4 p-4 bg-gray-50/50 rounded-xl border border-gray-100 group-hover:bg-white transition-colors">
+                                                                    <p className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Cover Letter</p>
                                                                     <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{proposal.cover_letter || 'No cover letter provided.'}</p>
                                                                 </div>
                                                                 
@@ -305,13 +305,13 @@ const JobDetail = () => {
                                                                         <>
                                                                             <button 
                                                                                 onClick={() => handleAcceptProposal(proposal.id)}
-                                                                                className="flex-1 px-3 py-2 bg-green-600 text-white text-xs font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                                                                                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs font-bold rounded-xl hover:from-green-500 hover:to-emerald-500 transition-all shadow-md shadow-green-500/20"
                                                                             >
                                                                                 Accept Proposal
                                                                             </button>
                                                                             <button 
                                                                                 onClick={() => handleRejectProposal(proposal.id)}
-                                                                                className="flex-1 px-3 py-2 border border-red-200 text-red-600 text-xs font-semibold rounded-lg hover:bg-red-50 transition-colors"
+                                                                                className="flex-1 px-4 py-2.5 border border-red-200 text-red-600 text-xs font-bold rounded-xl hover:bg-red-50 transition-colors"
                                                                             >
                                                                                 Reject
                                                                             </button>
@@ -334,7 +334,7 @@ const JobDetail = () => {
                                                 </p>
                                             ) : (
                                                 recommendedWorkers.map((worker) => (
-                                                    <div key={worker.id} className="border border-gray-200 rounded-lg p-4 bg-gradient-to-r from-blue-50 to-white hover:shadow-sm transition-shadow">
+                                                    <div key={worker.id} className="border border-gray-100 rounded-2xl p-5 bg-gradient-to-r from-blue-50/50 to-white hover:shadow-md transition-all">
                                                         <div className="flex justify-between items-start">
                                                             <div className="flex gap-3">
                                                                 <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
@@ -415,7 +415,7 @@ const JobDetail = () => {
                                                             <div key={cp.id || idx} className={`border rounded-xl p-5 transition-all ${
                                                                 status === 'APPROVED' ? 'border-green-200 bg-green-50/50' : 
                                                                 status === 'SUBMITTED' ? 'border-yellow-200 bg-yellow-50/50' :
-                                                                'border-gray-200 bg-white hover:border-blue-200 hover:shadow-sm'
+                                                                'border-gray-100 bg-white hover:border-blue-200 hover:shadow-md'
                                                             }`}>
                                                                 <div className="flex justify-between items-start">
                                                                     <div className="flex gap-4">
@@ -702,7 +702,7 @@ const JobDetail = () => {
 
                         {/* Right: summary card */}
                         <div className="space-y-6">
-                            <section className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm">
+                            <section className="bg-white rounded-[2rem] border border-gray-100 p-8 shadow-sm hover:shadow-md transition-shadow sticky top-[100px]">
                                 <h2 className="text-sm font-semibold text-gray-900 mb-3">
                                     Job Details
                                 </h2>

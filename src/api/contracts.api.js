@@ -22,8 +22,13 @@ export const contractsApi = {
   },
 
   // Sign contract
-  signContract: (id) => {
-    return axiosClient.post(`/contracts/${id}/sign`);
+  signContract: (id, otp) => {
+    return axiosClient.post(`/contracts/${id}/sign`, { otp });
+  },
+
+  // Request OTP for signing
+  requestSignOtp: (id) => {
+    return axiosClient.post(`/contracts/${id}/request-otp`);
   },
 
   // Submit checkpoint work

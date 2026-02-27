@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "../contexts/ToastContext";
 import FAFLogo from "../assets/FAF-Logo.png";
 import { authApi } from "../api/auth.api";
@@ -17,6 +17,7 @@ const Signup = () => {
     confirmPassword: "",
     tos: false,
   });
+  const [loading, setLoading] = useState(false);
 
   const togglePassword = () => setShowPassword((prev) => !prev);
   const toggleConfirm = () => setShowConfirm((prev) => !prev);
@@ -58,6 +59,7 @@ const Signup = () => {
       return;
     }
 
+    setLoading(true);
     // Call API to register
     try {
       const response = await authApi.register({
@@ -72,409 +74,252 @@ const Signup = () => {
     } catch (error) {
       console.error("Registration failed:", error);
       toast.error("Đăng ký thất bại");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Lock scroll for app feel
+  useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+        document.documentElement.style.overflow = 'auto';
+    };
+  }, []);
+
   return (
-    <div className="min-h-screen auth-gradient flex flex-col items-center">
-      <header className="w-full flex justify-center pt-10 pb-6">
-        <div className="flex items-center gap-2">
-          <img
-            src={FAFLogo}
-            alt="FAF logo"
-            className="h-10 w-auto object-contain"
-          />
-        </div>
-      </header>
+    <div className="min-h-[100dvh] h-screen bg-slate-950 font-sans text-slate-200 selection:bg-purple-500/30 flex items-center justify-center relative overflow-hidden">
+      {/* --- GLOBAL WEB3 BACKGROUND --- */}
+      <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[20%] left-[60%] w-[50%] h-[50%] bg-purple-600/10 rounded-full mix-blend-screen blur-[120px] animate-blob"></div>
+          <div className="absolute bottom-[10%] right-[30%] w-[60%] h-[60%] bg-blue-600/10 rounded-full mix-blend-screen blur-[120px] animate-blob animation-delay-4000"></div>
+          
+          {/* 3D Grid Floor positioned below content */}
+          <div className="absolute bottom-[-10%] w-[200%] left-[-50%] h-[60%] web3-grid opacity-30 z-0"></div>
+          
+          {/* Central Orb */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] glow-orb-bg rounded-full z-0 pointer-events-none mix-blend-screen animate-[pulse-ring_10s_cubic-bezier(0.4,0,0.6,1)_infinite]"></div>
+      </div>
 
-      <main className="w-full px-4 pb-12 flex justify-center">
-        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-gray-100 px-10 py-12">
-          <div className="text-center space-y-2 mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Create your account
-            </h1>
-            <p className="text-sm text-gray-500">
-              Join the future of work. Already have an account?{" "}
-              <a
-                href="/signin"
-                className="text-blue-600 font-semibold hover:underline"
-              >
-                Log in
-              </a>
-            </p>
+      {/* Static Noise Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10 pointer-events-none"></div>
+
+      {/* Top Navigation / Status Bar (Terminal style) */}
+      <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20 pointer-events-auto transition-opacity duration-300">
+          <Link to="/" className="flex items-center gap-2 group cursor-crosshair">
+              <svg className="w-5 h-5 text-purple-500 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              <span className="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover:text-purple-400 transition-colors">Abort Initialization</span>
+          </Link>
+          <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Registration Module Online</span>
           </div>
+      </div>
 
-          <div className="grid grid-cols-2 gap-2 mb-8">
+      <main className={`w-full max-w-2xl px-6 relative z-20 overflow-y-auto max-h-[100dvh] pt-24 pb-12 custom-scrollbar ${loading ? "pointer-events-none opacity-60" : ""}`}>
+        <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight text-glitch-effect cursor-crosshair inline-block mb-2">
+              INITIALIZE PROFILE
+            </h1>
+            <p className="text-sm font-mono text-slate-400">
+              Establish your on-chain identity. Already registered?{" "}
+              <Link
+                to="/signin"
+                className="text-white border-b border-transparent hover:border-purple-400 hover:text-purple-400 transition-all font-semibold"
+              >
+                Access Terminal
+              </Link>
+            </p>
+        </div>
+
+        <div className="glass-card bg-slate-900/50 border border-slate-700/50 rounded-3xl p-6 sm:p-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl relative">
+            {/* Inner glowing accent */}
+            <div className="absolute top-0 right-1/4 w-1/2 h-[1px] bg-gradient-to-l from-transparent via-blue-500 to-transparent opacity-50"></div>
+
+          <div className="grid grid-cols-2 gap-3 mb-8">
             <button
               type="button"
               onClick={() => setRole("worker")}
-              className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3 font-semibold transition ${
+              className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 font-mono font-bold transition-all text-xs sm:text-sm cursor-crosshair group relative overflow-hidden ${
                 role === "worker"
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+                  ? "bg-slate-900 border-blue-500 text-white shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                  : "bg-slate-950/80 border-white/10 text-slate-500 hover:border-white/30 hover:text-slate-300"
               }`}
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 21v-1a6 6 0 1112 0v1"
-                />
+              {role === "worker" && <div className="absolute inset-0 bg-blue-500/10 animate-pulse"></div>}
+              <svg className={`w-6 h-6 z-10 ${role === "worker" ? 'text-blue-400' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 21v-1a6 6 0 1112 0v1" />
               </svg>
-              Worker
+              <span className="z-10 relative">Execution Node<br/>(Worker)</span>
             </button>
             <button
               type="button"
               onClick={() => setRole("employer")}
-              className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-3 font-semibold transition ${
+              className={`flex flex-col items-center justify-center gap-2 rounded-2xl border px-3 py-4 font-mono font-bold transition-all text-xs sm:text-sm cursor-crosshair group relative overflow-hidden ${
                 role === "employer"
-                  ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                  : "bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+                  ? "bg-slate-900 border-purple-500 text-white shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                  : "bg-slate-950/80 border-white/10 text-slate-500 hover:border-white/30 hover:text-slate-300"
               }`}
             >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 9l9-6 9 6-9 6-9-6z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 15l9 6 9-6"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M3 12l9 6 9-6"
-                />
+              {role === "employer" && <div className="absolute inset-0 bg-purple-500/10 animate-pulse"></div>}
+              <svg className={`w-6 h-6 z-10 ${role === "employer" ? 'text-purple-400' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              Employer
+              <span className="z-10 relative">Contract Issuer<br/>(Employer)</span>
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="grid md:grid-cols-1 gap-5">
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="fullName"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Full Name
+                <label htmlFor="fullName" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                    Entity Name
                 </label>
-                <div className="relative">
-                  <input
-                    id="fullName"
-                    name="fullName"
-                    type="text"
-                    placeholder="Jane Doe"
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  />
-                  <svg
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 7h18M7 7V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7v10a2 2 0 002 2h6a2 2 0 002-2V7"
+                <div className="relative group/input">
+                    <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
+                    <input
+                        id="fullName"
+                        name="fullName"
+                        type="text"
+                        placeholder="SysAdmin"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner"
                     />
-                  </svg>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="email"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Email Address
+                <label htmlFor="email" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                    Comms Vector (Email)
                 </label>
-                <div className="relative">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="jane@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  />
-                  <svg
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 5h18v14H3z"
+                <div className="relative group/input">
+                    <div className="absolute inset-0 bg-purple-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
+                    <input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="node@protocol.xyz"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-medium text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500 outline-none transition-all shadow-inner"
                     />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M3 7l9 6 9-6"
-                    />
-                  </svg>
                 </div>
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Password
+                <label htmlFor="password" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                    Encryption Key
                 </label>
-                <div className="relative">
-                  <input
-                    id="password"
-                    name="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePassword}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    aria-label={
-                      showPassword ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"
-                    }
-                  >
-                    {showPassword ? (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                        />
-                      </svg>
-                    )}
-                  </button>
+                <div className="relative group/input">
+                    <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
+                    <input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        placeholder="••••••••••••"
+                        value={formData.password}
+                        onChange={handleChange}
+                        className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner tracking-widest"
+                    />
+                    <button type="button" onClick={togglePassword} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors cursor-crosshair z-10">
+                        {showPassword ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" /></svg>
+                        ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        )}
+                    </button>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label
-                  htmlFor="confirmPassword"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Confirm
+                <label htmlFor="confirmPassword" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                    Verify Key
                 </label>
-                <div className="relative">
-                  <input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirm ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleConfirm}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    aria-label={
-                      showConfirm ? "Ẩn mật khẩu" : "Hiển thị mật khẩu"
-                    }
-                  >
-                    {showConfirm ? (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-5 h-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                        />
-                      </svg>
-                    )}
-                  </button>
+                <div className="relative group/input">
+                    <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        type={showConfirm ? "text" : "password"}
+                        placeholder="••••••••••••"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner tracking-widest"
+                    />
+                    <button type="button" onClick={toggleConfirm} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors cursor-crosshair z-10">
+                        {showConfirm ? (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" /></svg>
+                        ) : (
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                        )}
+                    </button>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 text-sm text-gray-600">
+            <div className="flex items-start gap-3 text-xs font-mono text-slate-400 mt-2">
               <input
                 type="checkbox"
                 id="tos"
                 name="tos"
                 checked={formData.tos}
                 onChange={handleChange}
-                className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="mt-1 flex-shrink-0 cursor-crosshair rounded border-white/20 bg-slate-900/50 text-purple-500 focus:ring-purple-500/50"
               />
-              <label htmlFor="tos">
-                I agree to the{" "}
-                <span className="font-semibold text-gray-800">
-                  Terms of Service
-                </span>{" "}
-                and{" "}
-                <span className="font-semibold text-gray-800">
-                  Privacy Policy
-                </span>
+              <label htmlFor="tos" className="cursor-crosshair leading-relaxed">
+                Accept <span className="text-purple-400">PROTOCOL_TOS</span> and <span className="text-purple-400">PRIVACY_POLICY</span>. Committing data implies binding cryptographic agreement.
               </label>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 transition"
+              disabled={loading}
+              className="w-full relative group/btn overflow-hidden glass-card bg-slate-900 border border-blue-500/50 text-white font-mono font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
             >
-              Create Account
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
+                {loading ? (
+                    <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        EXECUTING...
+                    </span>
+                ) : (
+                    <>
+                        <span>EXECUTE_INITIALIZATION()</span>
+                        <svg className="w-5 h-5 text-blue-400 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </>
+                )}
             </button>
           </form>
 
-          <div className="flex items-center gap-4 my-8">
-            <span className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em]">
-              Or continue with
-            </span>
-            <span className="flex-1 h-px bg-gray-200" />
+          <div className="mt-8 flex flex-col gap-4 text-center">
+              <div className="flex items-center gap-3 opacity-50">
+                  <span className="flex-1 h-[1px] bg-gradient-to-r from-transparent to-white"></span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-white">EXTERNAL_NODES</span>
+                  <span className="flex-1 h-[1px] bg-gradient-to-l from-transparent to-white"></span>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3">
+                  <button type="button" className="flex items-center justify-center gap-2 bg-slate-900 border border-white/10 hover:border-white/30 rounded-lg py-3 transition-all text-xs font-mono font-bold text-slate-300 hover:text-white cursor-crosshair group/btn2">
+                      <span className="text-white group-hover/btn2:scale-110 transition-transform">G</span> GOOGLE_ID
+                  </button>
+                  <button type="button" className="flex items-center justify-center gap-2 bg-slate-900 border border-white/10 hover:border-white/30 rounded-lg py-3 transition-all text-xs font-mono font-bold text-slate-300 hover:text-white cursor-crosshair group/btn2">
+                      <span className="text-blue-500 group-hover/btn2:scale-110 transition-transform">in</span> LINKED_IN
+                  </button>
+              </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-3 border border-gray-200 rounded-lg py-3 hover:bg-gray-50 transition font-semibold text-gray-700">
-              <span className="text-lg">G</span>
-              Google
-            </button>
-            <button className="flex items-center justify-center gap-3 border border-gray-200 rounded-lg py-3 hover:bg-gray-50 transition font-semibold text-gray-700">
-              <span className="text-blue-600">
-                <svg
-                  className="w-5 h-5"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M4.98 3.5C4.98 4.88 3.88 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1 4.98 2.12 4.98 3.5zM.48 8h4V24h-4zM8.48 8h3.84v2.18h.05c.54-1.02 1.87-2.1 3.85-2.1 4.12 0 4.88 2.71 4.88 6.23V24h-4v-8.18c0-1.95-.03-4.46-2.72-4.46-2.73 0-3.15 2.13-3.15 4.33V24h-4z" />
-                </svg>
-              </span>
-              LinkedIn
-            </button>
-          </div>
-
-          <div className="mt-6 pt-4 border-t border-gray-100 text-center">
-            <a
-              href="/"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800"
-            >
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Back to Home
-            </a>
-          </div>
         </div>
       </main>
-
-      <footer className="pb-8 text-xs text-gray-400">
-        © 2026 FAF Platform Inc. All rights reserved.
-      </footer>
     </div>
   );
 };

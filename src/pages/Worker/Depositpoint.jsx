@@ -15,7 +15,6 @@ const Depositpoint = () => {
     const exchangeRate = 1.00 // 1 Point = $1.00 USD
 
     useEffect(() => {
-        // Calculate USD amount when points change
         setUsdAmount(points)
     }, [points])
 
@@ -33,126 +32,144 @@ const Depositpoint = () => {
     const subtotal = points * exchangeRate
     const totalDue = subtotal + processingFee
 
+    const handlePayment = () => {
+        setShowToast(true)
+        setTimeout(() => {
+            navigate('/wallet')
+        }, 2000)
+    }
+
     return (
-        <div className="w-full min-h-screen bg-blue-100">
+        <div className="w-full min-h-screen bg-[#020617] text-slate-300 relative flex flex-col font-sans">
+            {/* Ambient Background */}
+            <div className="fixed inset-0 pointer-events-none z-0" style={{ backgroundImage: 'repeating-linear-gradient(0deg,rgba(0,255,255,0.008) 0px,rgba(0,255,255,0.008) 1px,transparent 1px,transparent 3px)' }} />
+            <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+                <div className="absolute top-0 right-1/4 w-[500px] h-[400px] bg-cyan-500/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-1/4 left-1/4 w-[400px] h-[300px] bg-indigo-500/5 rounded-full blur-[100px]" />
+            </div>
+
             {/* Toast Notification */}
             {showToast && (
-                <div className="fixed top-4 right-4 z-50 animate-slide-in">
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 flex items-center gap-3 min-w-[320px]">
-                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center shrink-0">
-                            <svg className="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="fixed top-4 right-4 z-50 animate-[slideInRight_0.3s_ease-out]">
+                    <div className="bg-[#090e17] rounded-xl shadow-[0_0_30px_rgba(16,185,129,0.2)] border border-emerald-500/40 p-4 flex items-center gap-4 min-w-[320px] relative overflow-hidden">
+                        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
+                        <div className="h-10 w-10 rounded-lg bg-emerald-900/40 border border-emerald-500/50 flex flex-col items-center justify-center shrink-0">
+                            <svg className="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
                         <div className="flex-1">
-                            <div className="text-sm font-extrabold text-gray-900">Payment Successful!</div>
-                            <div className="text-xs font-semibold text-gray-500 mt-0.5">
-                                {points} points have been added to your account.
+                            <div className="text-[11px] font-black text-emerald-400 uppercase tracking-widest font-mono">TRANSACTION_SUCCESS</div>
+                            <div className="text-[10px] font-mono text-slate-400 mt-1 uppercase tracking-widest">
+                                +{points} CREDITS ADDED TO WALLET
                             </div>
                         </div>
                     </div>
                 </div>
             )}
 
-            <div className="mx-auto max-w-4xl px-4 py-8">
+            <div className="mx-auto max-w-4xl px-4 py-12 relative z-10">
                 {/* Header */}
-                <div className="mb-6">
+                <div className="mb-8 pl-2">
                     <button
                         onClick={() => navigate('/wallet')}
-                        className="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900 mb-4 transition-colors"
+                        className="inline-flex items-center gap-2 text-[10px] font-black font-mono text-cyan-500 hover:text-cyan-400 uppercase tracking-widest mb-6 transition-colors group"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
-                        Back to Wallet
+                        ABORT_AND_RETURN_TO_WALLET
                     </button>
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
-                            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    <div className="flex items-center gap-4">
+                        <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-cyan-900/50 to-blue-900/50 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.2)]">
+                            <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
                         </div>
                         <div>
-                            <h1 className="text-2xl font-extrabold text-gray-900">Deposit Points</h1>
-                            <p className="text-sm text-gray-600 mt-0.5">Add funds to your FAF account securely to unlock premium features.</p>
+                            <h1 className="text-2xl font-black text-white uppercase tracking-wider">ACQUIRE_FUNDS</h1>
+                            <p className="text-[11px] font-mono text-cyan-500/70 uppercase tracking-widest mt-1">Initiate secure currency exchange to FAF_CREDITS</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Main Content Card */}
-                <div className="rounded-2xl bg-white border border-gray-100 shadow-sm">
-                    <div className="px-6 py-6 space-y-6">
-                        {/* Amount to Deposit Section */}
-                        <div>
-                            <label className="block text-xs font-extrabold text-gray-700 mb-3">Amount to Deposit</label>
-                            <div className="flex items-center gap-3">
-                                <div className="flex-1">
-                                    <div className="relative">
-                                        <input
-                                            type="number"
-                                            value={points}
-                                            onChange={handlePointsChange}
-                                            className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pr-16 text-sm font-semibold text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-600/20"
-                                        />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-500">POINTS</span>
-                                    </div>
+                <div className="rounded-2xl border p-8 bg-[#090e17]/80 backdrop-blur-md relative overflow-hidden shadow-2xl" style={{ borderColor: 'rgba(6,182,212,0.2)' }}>
+                    {/* Cyber accents */}
+                    <div className="absolute top-0 right-10 w-32 h-px bg-cyan-400/50" />
+                    <div className="absolute top-0 right-10 w-px h-8 bg-cyan-400/50" />
+                    <div className="absolute bottom-0 left-10 w-32 h-px bg-cyan-400/50" />
+                    <div className="absolute bottom-0 left-10 w-px h-8 bg-cyan-400/50" />
+
+                    <div className="space-y-8">
+                        {/* Amount Section */}
+                        <div className="bg-[#02040a] rounded-xl border border-slate-800 p-6 relative">
+                            <div className="absolute -left-px top-6 bottom-6 w-0.5 bg-cyan-500" />
+                            <label className="block text-[10px] font-black text-cyan-500 uppercase tracking-widest font-mono mb-4">EXCHANGE_VOLUME</label>
+                            <div className="flex flex-col md:flex-row items-center gap-4">
+                                <div className="flex-1 w-full relative group">
+                                    <input
+                                        type="number"
+                                        value={points}
+                                        onChange={handlePointsChange}
+                                        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 pl-16 text-lg font-black font-mono text-cyan-300 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500/20 transition-all text-right"
+                                    />
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-cyan-500 font-mono tracking-widest bg-cyan-900/30 px-2 py-1 rounded">CREDITS</span>
                                 </div>
-                                <div className="text-gray-400">
-                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                
+                                <div className="text-cyan-500/50 shrink-0 rotate-90 md:rotate-0">
+                                    <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
                                 </div>
-                                <div className="flex-1">
-                                    <div className="relative">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-semibold text-gray-500">$</span>
-                                        <input
-                                            type="number"
-                                            value={usdAmount.toFixed(2)}
-                                            onChange={handleUsdChange}
-                                            className="w-full rounded-xl border border-gray-200 bg-white px-4 pl-8 py-3 text-sm font-semibold text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-600/20"
-                                        />
-                                    </div>
+                                
+                                <div className="flex-1 w-full relative">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-emerald-500 font-mono tracking-widest bg-emerald-900/30 px-2 py-1 rounded">USD</span>
+                                    <input
+                                        type="number"
+                                        value={usdAmount.toFixed(2)}
+                                        onChange={handleUsdChange}
+                                        className="w-full rounded-lg border border-slate-700 bg-slate-900 px-4 py-3 pl-[4.5rem] text-lg font-black font-mono text-emerald-300 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/20 transition-all text-right"
+                                    />
                                 </div>
                             </div>
-                            <p className="mt-2 text-xs font-semibold text-blue-600">
-                                • Exchange Rate: 1 Point = ${exchangeRate.toFixed(2)} USD
+                            <p className="mt-3 text-[10px] font-mono font-black text-slate-500 tracking-widest uppercase">
+                                RATE: 1_CREDIT = ${exchangeRate.toFixed(2)}_USD
                             </p>
                         </div>
 
-                        {/* Select Payment Method Section */}
+                        {/* Payment Method Section */}
                         <div>
-                            <label className="block text-xs font-extrabold text-gray-700 mb-3">Select Payment Method</label>
-                            <div className="grid grid-cols-2 gap-3">
+                            <label className="block text-[10px] font-black text-cyan-500 uppercase tracking-widest font-mono mb-4">PAYMENT_GATEWAY</label>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 {/* Credit Card Option */}
                                 <button
                                     onClick={() => setPaymentMethod('credit-card')}
-                                    className={`relative rounded-xl border-2 p-4 text-left transition-all ${paymentMethod === 'credit-card'
-                                        ? 'border-blue-600 bg-blue-50'
-                                        : 'border-gray-200 bg-white hover:border-gray-300'
+                                    className={`relative rounded-xl border p-4 text-left transition-all ${paymentMethod === 'credit-card'
+                                        ? 'border-cyan-500 bg-cyan-900/10 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+                                        : 'border-slate-800 bg-[#02040a] hover:border-slate-700'
                                         }`}
                                 >
                                     {paymentMethod === 'credit-card' && (
-                                        <div className="absolute top-2 right-2">
-                                            <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
-                                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="absolute top-3 right-3">
+                                            <div className="h-4 w-4 rounded-full bg-cyan-500 flex items-center justify-center">
+                                                <svg className="w-2.5 h-2.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             </div>
                                         </div>
                                     )}
-                                    <div className="flex items-center gap-3">
-                                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${paymentMethod === 'credit-card' ? 'bg-blue-600' : 'bg-gray-100'
-                                            }`}>
-                                            <svg className={`w-5 h-5 ${paymentMethod === 'credit-card' ? 'text-white' : 'text-gray-600'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`h-10 w-10 rounded border flex items-center justify-center transition-colors ${paymentMethod === 'credit-card' ? 'bg-cyan-500/10 border-cyan-500/50' : 'bg-slate-900 border-slate-700'}`}>
+                                            <svg className={`w-5 h-5 ${paymentMethod === 'credit-card' ? 'text-cyan-400' : 'text-slate-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className={`text-sm font-extrabold ${paymentMethod === 'credit-card' ? 'text-gray-900' : 'text-gray-700'}`}>
-                                                Credit Card
+                                            <div className="text-[11px] font-black tracking-widest uppercase font-mono text-slate-200">
+                                                CREDIT_CARD
                                             </div>
-                                            <div className="text-xs font-semibold text-gray-500 mt-0.5">Instant deposit</div>
+                                            <div className="text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-widest">INSTANT_PROCESS</div>
                                         </div>
                                     </div>
                                 </button>
@@ -160,32 +177,31 @@ const Depositpoint = () => {
                                 {/* PayPal Option */}
                                 <button
                                     onClick={() => setPaymentMethod('paypal')}
-                                    className={`relative rounded-xl border-2 p-4 text-left transition-all ${paymentMethod === 'paypal'
-                                        ? 'border-blue-600 bg-blue-50'
-                                        : 'border-gray-200 bg-white hover:border-gray-300'
+                                    className={`relative rounded-xl border p-4 text-left transition-all ${paymentMethod === 'paypal'
+                                        ? 'border-cyan-500 bg-cyan-900/10 shadow-[0_0_15px_rgba(6,182,212,0.15)]'
+                                        : 'border-slate-800 bg-[#02040a] hover:border-slate-700'
                                         }`}
                                 >
                                     {paymentMethod === 'paypal' && (
-                                        <div className="absolute top-2 right-2">
-                                            <div className="h-5 w-5 rounded-full bg-blue-600 flex items-center justify-center">
-                                                <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="absolute top-3 right-3">
+                                            <div className="h-4 w-4 rounded-full bg-cyan-500 flex items-center justify-center">
+                                                <svg className="w-2.5 h-2.5 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                                 </svg>
                                             </div>
                                         </div>
                                     )}
-                                    <div className="flex items-center gap-3">
-                                        <div className={`h-10 w-10 rounded-lg flex items-center justify-center ${paymentMethod === 'paypal' ? 'bg-blue-600' : 'bg-gray-100'
-                                            }`}>
-                                            <svg className={`w-5 h-5 ${paymentMethod === 'paypal' ? 'text-white' : 'text-gray-600'}`} fill="currentColor" viewBox="0 0 24 24">
+                                    <div className="flex items-center gap-4">
+                                        <div className={`h-10 w-10 rounded border flex items-center justify-center transition-colors ${paymentMethod === 'paypal' ? 'bg-blue-600/20 border-blue-500/50' : 'bg-slate-900 border-slate-700'}`}>
+                                            <svg className={`w-5 h-5 ${paymentMethod === 'paypal' ? 'text-blue-400' : 'text-slate-500'}`} fill="currentColor" viewBox="0 0 24 24">
                                                 <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a.805.805 0 0 0-.606-.274h-3.01c-.524 0-.968.382-1.05.9l-1.12 7.106c-.082.518.109.74.633.74h1.47c.524 0 .968-.382 1.05-.9l1.12-7.106a.805.805 0 0 0 .023-.166z" />
                                             </svg>
                                         </div>
                                         <div>
-                                            <div className={`text-sm font-extrabold ${paymentMethod === 'paypal' ? 'text-gray-900' : 'text-gray-700'}`}>
-                                                PayPal
+                                            <div className="text-[11px] font-black tracking-widest uppercase font-mono text-slate-200">
+                                                PAYPAL_NET
                                             </div>
-                                            <div className="text-xs font-semibold text-gray-500 mt-0.5">Connect account</div>
+                                            <div className="text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-widest">OAUTH_CONNECT</div>
                                         </div>
                                     </div>
                                 </button>
@@ -193,55 +209,40 @@ const Depositpoint = () => {
                         </div>
 
                         {/* Order Summary Section */}
-                        <div className="border-t border-dashed border-gray-200 pt-6 space-y-3">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-semibold text-gray-600">Subtotal ({points} Points)</span>
-                                <span className="text-sm font-extrabold text-gray-900">${subtotal.toFixed(2)}</span>
+                        <div className="bg-[#02040a] rounded-xl border border-slate-800 p-6 space-y-4 font-mono">
+                            <div className="flex items-center justify-between text-slate-400 text-[11px] uppercase tracking-widest">
+                                <span>SUBTOTAL ({points}_CRED)</span>
+                                <span className="text-white">${subtotal.toFixed(2)}</span>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-sm font-semibold text-gray-600">Processing Fee</span>
-                                    <button className="text-gray-400 hover:text-gray-600" title="Processing fee information">
-                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                                <span className="text-sm font-extrabold text-gray-900">${processingFee.toFixed(2)}</span>
+                            <div className="flex items-center justify-between text-slate-400 text-[11px] uppercase tracking-widest">
+                                <span>NETWORK_FEE</span>
+                                <span className="text-white">${processingFee.toFixed(2)}</span>
                             </div>
-                            <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                            <div className="flex items-center justify-between pt-4 border-t border-slate-800">
                                 <div>
-                                    <div className="text-base font-extrabold text-gray-900">Total Due</div>
-                                    <div className="text-xs font-semibold text-gray-500 mt-0.5">Includes all taxes</div>
+                                    <div className="text-[12px] font-black text-cyan-400 tracking-widest uppercase">TRANSACTION_TOTAL</div>
                                 </div>
-                                <span className="text-2xl font-extrabold text-gray-900">${totalDue.toFixed(2)}</span>
+                                <span className="text-2xl font-black text-white">${totalDue.toFixed(2)}</span>
                             </div>
                         </div>
 
                         {/* Pay Button */}
                         <button
-                            onClick={() => {
-                                // Simulate successful payment
-                                // In a real app, you would make an API call here to process the payment
-                                setShowToast(true)
-                                setTimeout(() => {
-                                    navigate('/wallet')
-                                }, 2000) // Navigate after 2 seconds
-                            }}
-                            className="w-full rounded-xl bg-blue-600 px-4 py-4 text-sm font-extrabold text-white hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                            onClick={handlePayment}
+                            className="w-full rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 py-4 text-[12px] font-black tracking-widest font-mono text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] border border-cyan-400/50 transition-all hover:scale-[1.02] flex items-center justify-center gap-3 uppercase"
                         >
-                            Pay ${totalDue.toFixed(2)} & Deposit
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                             </svg>
+                            AUTHORIZE_PAYMENT [ ${totalDue.toFixed(2)} ]
                         </button>
 
                         {/* Security Message */}
-                        <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div className="flex items-center justify-center gap-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                             </svg>
-                            <span>Payments processed securely via Stripe</span>
+                            <span>SECURE_ENCRYPTED_GATEWAY_STRIPE</span>
                         </div>
                     </div>
                 </div>

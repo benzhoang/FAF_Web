@@ -20,8 +20,8 @@ export const jobsApi = {
     return axiosClient.get("/jobs", { params });
   },
 
-  getMyJobs: (clientId) => {
-    return axiosClient.get("/jobs", { params: { clientId } });
+  getMyJobs: (clientId, limit = 100) => {
+    return axiosClient.get("/jobs/my", { params: { limit } });
   },
 
   getJobDetail: (id) => {

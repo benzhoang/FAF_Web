@@ -9,6 +9,7 @@ import Apply from "./pages/Worker/Apply/Apply";
 import Success from "./pages/Worker/Apply/Success";
 import WorkerDashboard from "./pages/Worker/WorkerDashboard";
 import ActiveJob from "./pages/Worker/ActiveJob";
+import CheckpointWorkspace from "./pages/Worker/CheckpointWorkspace";
 import ContractSign from "./pages/Worker/ContractSign";
 import ContractDetail from "./pages/Worker/ContractDetail";
 import Settings from "./pages/Worker/Settings";
@@ -64,7 +65,7 @@ function App() {
       <Route path="/forbidden" element={<Forbidden />} />
 
       {/* ========== PUBLIC ROUTES (With Navbar/Footer) ========== */}
-      <Route path="/" element={<PublicLayout><HomePage /></PublicLayout>} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/work/:id" element={<PublicLayout><WorkDetail /></PublicLayout>} />
       <Route path="/toast-demo" element={<PublicLayout><ToastDemo /></PublicLayout>} />
 
@@ -106,6 +107,14 @@ function App() {
         element={
           <ProtectedRoute roles={["worker", "admin"]}>
             <PublicLayout><ActiveJob /></PublicLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/workspace/checkpoint/:checkpointId"
+        element={
+          <ProtectedRoute roles={["worker", "admin"]}>
+            <CheckpointWorkspace />
           </ProtectedRoute>
         }
       />
@@ -180,7 +189,7 @@ function App() {
         path="/task-owner"
         element={
           <ProtectedRoute roles={['employer', 'admin']}>
-            <TaskOwnerPage />
+            <PublicLayout><TaskOwnerPage /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -188,7 +197,7 @@ function App() {
         path="/task-owner/contract/:id/sign"
         element={
           <ProtectedRoute roles={['employer', 'admin']}>
-            <EmployerContractSign />
+            <PublicLayout><EmployerContractSign /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -196,7 +205,7 @@ function App() {
         path="/task-owner/contracts/:contractId/review"
         element={
           <ProtectedRoute roles={['employer', 'admin']}>
-            <CheckpointReview />
+            <PublicLayout><CheckpointReview /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -204,7 +213,7 @@ function App() {
         path="/task-owner/jobs"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <Jobs />
+            <PublicLayout><Jobs /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -212,7 +221,7 @@ function App() {
         path="/task-owner/jobs/:id"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <JobDetail />
+            <PublicLayout><JobDetail /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -220,7 +229,7 @@ function App() {
         path="/task-owner/contracts"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <Contracts />
+            <PublicLayout><Contracts /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -228,7 +237,7 @@ function App() {
         path="/task-owner/profiles"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <ProfilesPage />
+            <PublicLayout><ProfilesPage /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -236,7 +245,7 @@ function App() {
         path="/task-owner/talent"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <Talents />
+            <PublicLayout><Talents /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -244,7 +253,7 @@ function App() {
         path="/task-owner/talent/:id"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <TalentDetail />
+            <PublicLayout><TalentDetail /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -252,7 +261,7 @@ function App() {
         path="/task-owner/post-job"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <Postjob />
+            <PublicLayout><Postjob /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -260,7 +269,7 @@ function App() {
         path="/task-owner/jobs/:id/edit"
         element={
           <ProtectedRoute roles={["employer", "admin"]}>
-            <EditJob />
+            <PublicLayout><EditJob /></PublicLayout>
           </ProtectedRoute>
         }
       />
@@ -305,7 +314,7 @@ function App() {
         path="/profile/:id"
         element={
           <ProtectedRoute roles={["worker", "employer", "admin"]}>
-            <PublicProfile />
+            <PublicLayout><PublicProfile /></PublicLayout>
           </ProtectedRoute>
         }
       />

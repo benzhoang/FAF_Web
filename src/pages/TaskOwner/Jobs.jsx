@@ -11,6 +11,8 @@ const Jobs = () => {
     const { user } = useAuth();
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentPage, setCurrentPage] = useState(1);
+    const PAGE_SIZE = 5;
 
     useEffect(() => {
         if (user) {
@@ -29,6 +31,9 @@ const Jobs = () => {
             setLoading(false);
         }
     };
+
+    const totalPages = Math.ceil(jobs.length / PAGE_SIZE);
+    const paginatedJobs = jobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
     const handleDeleteJob = async (id) => {
         if (window.confirm("Are you sure you want to delete this job?")) {
@@ -73,7 +78,9 @@ const Jobs = () => {
                                 Job Listings
                             </h2>
                             <span className="text-xs font-semibold text-gray-500">
-                                {jobs.length} jobs
+                                {jobs.length > 0
+                                    ? `Showing ${(currentPage - 1) * PAGE_SIZE + 1}–${Math.min(currentPage * PAGE_SIZE, jobs.length)} of ${jobs.length} jobs`
+                                    : '0 jobs'}
                             </span>
                         </div>
 
@@ -115,7 +122,7 @@ const Jobs = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white divide-y divide-gray-100">
-                                        {jobs.map((job) => (
+                                        {paginatedJobs.map((job) => (
                                             <tr key={job.id} className="hover:bg-gray-50 transition-colors">
                                                 <td className="px-6 py-4 text-sm">
                                                     <div className="font-semibold text-gray-900">
@@ -177,6 +184,41 @@ const Jobs = () => {
                                         ))}
                                     </tbody>
                                 </table>
+                            </div>
+                        )}
+
+                        {/* Pagination */}
+                        {totalPages > 1 && (
+                            <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                                    disabled={currentPage === 1}
+                                    className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    ← Prev
+                                </button>
+                                <div className="flex items-center gap-1">
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                                        <button
+                                            key={page}
+                                            onClick={() => setCurrentPage(page)}
+                                            className={`w-9 h-9 text-sm font-semibold rounded-lg transition-colors ${
+                                                page === currentPage
+                                                    ? 'bg-blue-600 text-white'
+                                                    : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            {page}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                                    disabled={currentPage === totalPages}
+                                    className="px-4 py-2 text-sm font-semibold rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                                >
+                                    Next →
+                                </button>
                             </div>
                         )}
                     </div>

@@ -25,37 +25,37 @@ const Contracts = () => {
         <div className="min-h-screen bg-gray-50 flex">
             <TaskOwnerSidebar />
 
-            <div className="flex-1 flex flex-col">
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
                 {/* Header */}
-                <header className="bg-white border-b border-gray-200 px-6 py-4">
-                    <div className="flex items-center justify-between">
+                <header className="sticky top-0 z-10 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm px-6 py-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Contracts</h1>
-                            <p className="text-sm text-gray-600">
-                                View and edit your standard work contracts.
+                            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">Contract Templates</h1>
+                            <p className="text-sm font-medium text-gray-500 mt-1">
+                                View and edit your standard work contracts for future hires.
                             </p>
                         </div>
                         <div className="flex items-center gap-3">
                             <select
                                 value={selectedType}
                                 onChange={(e) => setSelectedType(e.target.value)}
-                                className="border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-500 bg-white"
+                                className="border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-700 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-white shadow-sm cursor-pointer hover:border-blue-300 transition-colors"
                             >
-                                <option value="short-term">Short-term contract</option>
-                                <option value="long-term">Long-term contract</option>
+                                <option value="short-term">Short-term Contract</option>
+                                <option value="long-term">Long-term Contract</option>
                             </select>
                             <button
-                                className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                className="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-700 bg-white hover:bg-gray-50 hover:text-gray-900 hover:shadow-sm transition-all shadow-sm"
                                 onClick={() => navigate("/task-owner")}
                             >
-                                Back to dashboard
+                                Back to Dashboard
                             </button>
                         </div>
                     </div>
                 </header>
 
                 {/* Main content: reuse Step4Contract editor */}
-                <main className="flex-1 p-6 overflow-y-auto">
+                <main className="flex-1 p-6 overflow-y-auto bg-gray-50/50">
                     <Step4Contract
                         selectedType={selectedType}
                         jobTitle=""

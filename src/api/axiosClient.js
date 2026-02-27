@@ -2,9 +2,6 @@ import axios from "axios";
 
 const axiosClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
-  headers: {
-    "Content-Type": "application/json",
-  },
   timeout: 10000,
 });
 
@@ -14,8 +11,18 @@ axiosClient.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // If data is FormData, let the browser set Content-Type automatically
+  // (it needs to include the multipart boundary string)
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+  } else {
+    config.headers["Content-Type"] = "application/json";
+  }
+
   return config;
 });
+
 
 // Response interceptor
 axiosClient.interceptors.response.use(

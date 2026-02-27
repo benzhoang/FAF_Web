@@ -242,14 +242,14 @@ const ActiveJob = () => {
             <div className="max-w-6xl mx-auto px-4 py-8">
                 {/* Job Finished Banner */}
                 {isFinished && (
-                    <div className={`mb-6 p-6 rounded-2xl border-2 flex items-center justify-between ${
+                    <div className={`mb-8 p-8 rounded-[2rem] border flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm hover:shadow-md transition-shadow ${
                         contract.status === 'COMPLETED' 
-                            ? 'bg-green-50 border-green-200' 
-                            : 'bg-red-50 border-red-200'
+                            ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-green-200' 
+                            : 'bg-gradient-to-r from-red-50 to-rose-50 border-red-200'
                     }`}>
-                        <div className="flex items-center gap-4">
-                            <div className={`p-3 rounded-xl ${
-                                contract.status === 'COMPLETED' ? 'bg-green-100' : 'bg-red-100'
+                        <div className="flex items-center gap-5">
+                            <div className={`p-4 rounded-2xl shadow-sm ${
+                                contract.status === 'COMPLETED' ? 'bg-white text-green-600' : 'bg-white text-red-600'
                             }`}>
                                 <svg className={`w-8 h-8 ${
                                     contract.status === 'COMPLETED' ? 'text-green-600' : 'text-red-600'
@@ -276,10 +276,10 @@ const ActiveJob = () => {
                         </div>
                         <button 
                             onClick={() => navigate('/dashboard')}
-                            className={`px-6 py-3 rounded-xl font-bold transition-all shadow-sm hover:shadow-md ${
+                            className={`px-8 py-3.5 rounded-xl font-bold transition-all shadow-md hover:shadow-lg transform active:scale-95 whitespace-nowrap ${
                                 contract.status === 'COMPLETED'
-                                    ? 'bg-green-600 text-white hover:bg-green-700'
-                                    : 'bg-red-600 text-white hover:bg-red-700'
+                                    ? 'bg-gradient-to-r from-green-600 to-emerald-600 text-white hover:from-green-500 hover:to-emerald-500 shadow-green-500/20'
+                                    : 'bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-500 hover:to-rose-500 shadow-red-500/20'
                             }`}
                         >
                             Return to Dashboard
@@ -288,9 +288,9 @@ const ActiveJob = () => {
                 )}
                 {/* Signature Warning if not both signed */}
                 {!bothSigned && (
-                    <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-6 mb-6">
-                        <div className="flex items-start gap-4">
-                            <div className="flex-shrink-0 p-3 bg-yellow-100 rounded-xl">
+                    <div className="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-[2rem] p-8 mb-8 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-5">
+                            <div className="flex-shrink-0 p-4 bg-white rounded-2xl shadow-sm">
                                 <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
@@ -324,7 +324,7 @@ const ActiveJob = () => {
                                 {!contract.signature_worker && (
                                     <button
                                         onClick={() => navigate(`/contract/${contract.id}/sign`)}
-                                        className="mt-4 px-6 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                                        className="mt-6 px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-indigo-500 flex items-center gap-2 shadow-md shadow-blue-500/20 transform active:scale-95 transition-all"
                                     >
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -339,9 +339,9 @@ const ActiveJob = () => {
 
                 {/* Expiration Warning */}
                 {isExpired && (
-                    <div className="bg-red-50 border-2 border-red-300 rounded-xl p-6 mb-6">
-                        <div className="flex items-start gap-4">
-                            <div className="flex-shrink-0 p-3 bg-red-100 rounded-xl">
+                    <div className="bg-gradient-to-r from-red-50 to-rose-50 border border-red-200 rounded-[2rem] p-8 mb-8 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-start gap-5">
+                            <div className="flex-shrink-0 p-4 bg-white rounded-2xl shadow-sm">
                                 <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
@@ -357,10 +357,10 @@ const ActiveJob = () => {
                                 <button
                                     onClick={handleRequestSettlement}
                                     disabled={!!contract.settlement_requested_at}
-                                    className={`px-6 py-2.5 font-semibold rounded-lg flex items-center gap-2 ${
+                                    className={`mt-4 px-8 py-3 font-bold rounded-xl flex items-center gap-2 transition-all shadow-md ${
                                         contract.settlement_requested_at 
-                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed"
-                                            : "bg-red-600 text-white hover:bg-red-700"
+                                            ? "bg-gray-100 text-gray-400 cursor-not-allowed shadow-none"
+                                            : "bg-gradient-to-r from-red-600 to-rose-600 text-white hover:from-red-500 hover:to-rose-500 shadow-red-500/20 transform active:scale-95"
                                     }`}
                                 >
                                     {contract.settlement_requested_at ? "Settlement Requested" : "Request Settlement"}
@@ -371,8 +371,9 @@ const ActiveJob = () => {
                 )}
 
                 {/* Header */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                    <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 mb-8 hover:shadow-md transition-shadow relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                    <div className="flex items-center justify-between mb-8">
                         <button 
                             onClick={() => navigate('/dashboard')}
                             className="text-gray-600 hover:text-gray-900 font-medium text-sm flex items-center gap-2 transition-colors"
@@ -467,8 +468,8 @@ const ActiveJob = () => {
                 </div>
 
                 {/* Progress */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-                    <div className="flex justify-between items-center mb-3">
+                <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 mb-8 hover:shadow-md transition-shadow">
+                    <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-bold text-gray-900">Overall Progress</h2>
                         <span className="text-sm font-semibold text-gray-600">
                             {completedCheckpoints} / {totalCheckpoints} Checkpoints Completed
@@ -484,8 +485,8 @@ const ActiveJob = () => {
                 </div>
 
                 {/* Checkpoints List */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-4">Checkpoints</h2>
+                <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
+                    <h2 className="text-2xl font-black text-gray-900 mb-6">Checkpoints</h2>
                     
                     <div className="space-y-4">
                         {contract.checkpoints && contract.checkpoints.length > 0 ? (
@@ -497,11 +498,11 @@ const ActiveJob = () => {
                                 return (
                                     <div 
                                         key={checkpoint.id}
-                                        className={`border-2 rounded-xl p-5 transition-all ${
-                                            checkpoint.status === 'APPROVED' ? 'border-green-200 bg-green-50/30' :
-                                            checkpoint.status === 'SUBMITTED' ? 'border-yellow-200 bg-yellow-50/30' :
-                                            canSubmit ? 'border-blue-200 bg-blue-50/30' :
-                                            'border-gray-200 bg-gray-50/30'
+                                        className={`border border-gray-100 rounded-2xl p-6 transition-all shadow-sm group hover:shadow-md ${
+                                            checkpoint.status === 'APPROVED' ? 'bg-gradient-to-r from-green-50/50 to-emerald-50/50' :
+                                            checkpoint.status === 'SUBMITTED' ? 'bg-gradient-to-r from-yellow-50/50 to-amber-50/50' :
+                                            canSubmit ? 'bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-blue-200' :
+                                            'bg-gray-50/30 hover:bg-white'
                                         }`}
                                     >
                                         <div className="flex justify-between items-start mb-3">
@@ -574,10 +575,14 @@ const ActiveJob = () => {
                                         {/* Submit Button */}
                                         {canSubmit && !isFinished && (
                                             <button
-                                                onClick={() => handleOpenSubmitModal(checkpoint)}
-                                                className="mt-4 w-full py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                                                onClick={() => navigate(`/workspace/checkpoint/${checkpoint.id}`)}
+                                                className="mt-6 w-full py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-500/20 transform active:scale-[0.98]"
                                             >
-                                                Submit Work
+                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                🎬 Start Checkpoint
                                             </button>
                                         )}
 
@@ -588,12 +593,25 @@ const ActiveJob = () => {
                                         )}
 
                                         {checkpoint.status === 'SUBMITTED' && (
-                                            <p className="mt-4 text-sm text-yellow-700 font-medium text-center flex items-center justify-center gap-2">
-                                                <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                                </svg>
-                                                Waiting for client review...
-                                            </p>
+                                            <div className="mt-4 flex flex-col items-center gap-3">
+                                                <p className="text-sm text-yellow-700 font-medium flex items-center justify-center gap-2">
+                                                    <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                    </svg>
+                                                    Waiting for client review...
+                                                </p>
+                                                {!isFinished && (
+                                                    <button
+                                                        onClick={() => navigate(`/workspace/checkpoint/${checkpoint.id}`)}
+                                                        className="px-4 py-2 bg-white border border-yellow-300 text-yellow-700 font-bold rounded-xl hover:bg-yellow-50 transition-all text-sm flex items-center gap-2 shadow-sm"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                                        </svg>
+                                                        Chỉnh sửa / Nộp lại
+                                                    </button>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 );

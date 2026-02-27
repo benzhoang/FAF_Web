@@ -13,8 +13,20 @@ export const userApi = {
   updateProfile(data) {
     return axiosClient.put("/users/me", data);
   },
-  getFeaturedWorkers(limit = 10) {
-    return axiosClient.get("/users/featured", { params: { limit } });
+  getFeaturedWorkers: () => {
+    return axiosClient.get('/users/featured?limit=5');
+  },
+
+  // 🌟 Tính năng Follow
+  followUser: (userId) => {
+    return axiosClient.post(`/users/${userId}/follow`);
+  },
+  checkFollowStatus: (userId) => {
+    return axiosClient.get(`/users/${userId}/follow-status`);
+  },
+
+  unfollowUser: (userId) => {
+    return axiosClient.delete(`/users/${userId}/follow`);
   },
   getPortfolio(userId) {
     return axiosClient.get(`/users/profile/portfolio/${userId}`);

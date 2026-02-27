@@ -25,6 +25,14 @@ const ResetPassword = () => {
     }
   }, [email, navigate]);
 
+  // Lock scroll for app feel
+  React.useEffect(() => {
+    document.documentElement.style.overflow = 'hidden';
+    return () => {
+        document.documentElement.style.overflow = 'auto';
+    };
+  }, []);
+
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return;
 
@@ -132,34 +140,59 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen auth-gradient flex flex-col items-center">
-      <header className="w-full flex justify-center pt-10 pb-6">
-        <div className="flex items-center gap-2">
-          <img
-            src={FAFLogo}
-            alt="FAF logo"
-            className="h-10 w-auto object-contain"
-          />
-        </div>
-      </header>
+    <div className="min-h-[100dvh] h-screen bg-slate-950 font-sans text-slate-200 selection:bg-purple-500/30 flex items-center justify-center relative overflow-hidden">
+      {/* --- GLOBAL WEB3 BACKGROUND --- */}
+      <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[20%] left-[60%] w-[50%] h-[50%] bg-purple-600/10 rounded-full mix-blend-screen blur-[120px] animate-blob"></div>
+          <div className="absolute bottom-[10%] right-[30%] w-[60%] h-[60%] bg-blue-600/10 rounded-full mix-blend-screen blur-[120px] animate-blob animation-delay-4000"></div>
+          
+          {/* 3D Grid Floor positioned below content */}
+          <div className="absolute bottom-[-10%] w-[200%] left-[-50%] h-[60%] web3-grid opacity-30 z-0"></div>
+          
+          {/* Central Orb */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] glow-orb-bg rounded-full z-0 pointer-events-none mix-blend-screen animate-[pulse-ring_10s_cubic-bezier(0.4,0,0.6,1)_infinite]"></div>
+      </div>
 
-      <main className="w-full px-4 pb-12 flex justify-center">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 px-10 py-12">
-          <div className="text-center space-y-2 mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Reset Your Password</h1>
-            <p className="text-sm text-gray-500">
-              We've sent a verification code to
-            </p>
-            <p className="text-sm font-semibold text-blue-600">{email}</p>
+      {/* Static Noise Overlay */}
+      <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay z-10 pointer-events-none"></div>
+
+      {/* Top Navigation / Status Bar (Terminal style) */}
+      <div className="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20 pointer-events-auto transition-opacity duration-300">
+          <Link to="/" className="flex items-center gap-2 group cursor-crosshair">
+              <svg className="w-5 h-5 text-purple-500 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              <span className="font-mono text-xs uppercase tracking-widest text-slate-400 group-hover:text-purple-400 transition-colors">Abort Key Restructuring</span>
+          </Link>
+          <div className="flex items-center gap-2">
+              <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-widest text-slate-500">Reconfiguration Module Online</span>
           </div>
+      </div>
+
+      <main className={`w-full max-w-md px-6 relative z-20 overflow-y-auto max-h-[100dvh] pt-24 pb-12 custom-scrollbar ${loading ? "pointer-events-none opacity-60" : ""}`}>
+        <div className="text-center mb-8">
+            <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight text-glitch-effect cursor-crosshair inline-block mb-2">
+              KEY OVERRIDE
+            </h1>
+            <p className="text-sm font-mono text-slate-400">
+              Clearance code sent to <br/>
+              <span className="text-white font-semibold">[{email || "UNKNOWN_NODE"}]</span>
+            </p>
+        </div>
+
+        <div className="glass-card bg-slate-900/50 border border-slate-700/50 rounded-3xl p-8 sm:p-10 shadow-[0_30px_60px_rgba(0,0,0,0.6)] backdrop-blur-2xl relative">
+            {/* Inner glowing accent */}
+            <div className="absolute top-0 right-1/4 w-1/2 h-[1px] bg-gradient-to-l from-transparent via-blue-500 to-transparent opacity-50"></div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* OTP Input */}
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-gray-700">
-                Verification Code
+              <label className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                Protocol Override Code
               </label>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2 sm:gap-3">
                 {otp.map((digit, index) => (
                   <input
                     key={index}
@@ -171,7 +204,7 @@ const ResetPassword = () => {
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
                     onPaste={handlePaste}
-                    className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition"
+                    className="w-10 sm:w-12 h-14 bg-slate-950/80 hover:bg-slate-900 text-center text-2xl font-mono font-bold border border-white/10 text-white rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500/50 outline-none transition-all shadow-inner relative group-focus-within:bg-slate-900"
                   />
                 ))}
               </div>
@@ -179,36 +212,29 @@ const ResetPassword = () => {
 
             {/* New Password */}
             <div className="space-y-2">
-              <label
-                htmlFor="newPassword"
-                className="text-sm font-semibold text-gray-700"
-              >
-                New Password
+              <label htmlFor="newPassword" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                New Encryption Key
               </label>
-              <div className="relative">
+              <div className="relative group/input">
+                <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
                 <input
                   id="newPassword"
                   name="newPassword"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  placeholder="••••••••••••"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner tracking-widest"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors cursor-crosshair z-10"
                 >
                   {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" />
-                    </svg>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" /></svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                   )}
                 </button>
               </div>
@@ -216,36 +242,29 @@ const ResetPassword = () => {
 
             {/* Confirm Password */}
             <div className="space-y-2">
-              <label
-                htmlFor="confirmPassword"
-                className="text-sm font-semibold text-gray-700"
-              >
-                Confirm Password
+              <label htmlFor="confirmPassword" className="text-xs font-mono text-slate-400 uppercase tracking-widest flex justify-between">
+                Verify New Key
               </label>
-              <div className="relative">
+              <div className="relative group/input">
+                <div className="absolute inset-0 bg-blue-500/20 rounded-xl blur-md opacity-0 group-focus-within/input:opacity-100 transition-opacity"></div>
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
                   type={showConfirm ? 'text' : 'password'}
-                  placeholder="••••••••"
+                  placeholder="••••••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                  className="w-full relative bg-slate-950/80 hover:bg-slate-900 border border-white/10 rounded-xl px-4 py-3 text-sm font-mono text-white placeholder:text-slate-600 focus:bg-slate-900 focus:ring-1 focus:ring-blue-500/50 focus:border-blue-500 outline-none transition-all shadow-inner tracking-widest"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-600 hover:text-white transition-colors cursor-crosshair z-10"
                 >
                   {showConfirm ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" />
-                    </svg>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-5.523 0-10-5-10-7 0-.695.395-1.77 1.17-2.992m4.229-3.63A9.966 9.966 0 0112 5c5.523 0 10 5 10 7 0 1.012-.54 2.41-1.558 3.77M15 12a3 3 0 00-3-3m0 0a2.99 2.99 0 00-1.354.322m0 0L9.171 9.171M9.171 9.171 4 4m5.646 5.646L4 4m9.354 9.354L20 20" /></svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                   )}
                 </button>
               </div>
@@ -253,21 +272,17 @@ const ResetPassword = () => {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                <svg className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-red-700">{error}</p>
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                <p>{error}</p>
               </div>
             )}
 
             {/* Success Message */}
             {success && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-start gap-2">
-                <svg className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-green-700">{success}</p>
+              <div className="bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-3 rounded-xl text-sm font-medium flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 animate-ping"></span>
+                <p>{success}</p>
               </div>
             )}
 
@@ -275,24 +290,21 @@ const ResetPassword = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-lg text-sm font-semibold shadow-lg transition-colors flex items-center justify-center gap-2 ${
-                loading
-                  ? 'bg-gray-400 cursor-not-allowed text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20'
-              }`}
+              className="w-full relative group/btn overflow-hidden glass-card bg-slate-900 border border-blue-500/50 text-white font-mono font-bold uppercase tracking-widest py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.2)] hover:shadow-[0_0_40px_rgba(59,130,246,0.4)] transition-all flex items-center justify-center gap-3 disabled:opacity-50 mt-4"
             >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 group-hover/btn:opacity-100 transition-opacity"></div>
               {loading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <span className="flex items-center gap-2">
+                  <svg className="animate-spin h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Resetting...
-                </>
+                  COMMITTING_KEY...
+                </span>
               ) : (
                 <>
-                  Reset Password
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span>CONFIRM_OVERRIDE()</span>
+                  <svg className="w-5 h-5 text-blue-400 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </>
@@ -301,37 +313,33 @@ const ResetPassword = () => {
           </form>
 
           {/* Resend OTP */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600 mb-2">
-              Didn't receive the code?
-            </p>
-            <button
-              type="button"
-              onClick={handleResendOtp}
-              disabled={resending}
-              className="text-sm font-semibold text-blue-600 hover:text-blue-700 hover:underline disabled:text-gray-400"
-            >
-              {resending ? 'Sending...' : 'Resend OTP'}
-            </button>
+          <div className="mt-8 text-center flex flex-col items-center">
+              <p className="text-xs font-mono text-slate-500 mb-2 uppercase tracking-widest">
+                  Signal Interrupted?
+              </p>
+              <button
+                  type="button"
+                  onClick={handleResendOtp}
+                  disabled={resending}
+                  className="text-xs font-mono font-bold text-white hover:text-blue-400 border-b border-white/20 hover:border-blue-400 pb-0.5 transition-all cursor-crosshair disabled:text-slate-600 disabled:border-slate-800"
+              >
+                  {resending ? 'TRANSMITTING...' : 'RE-TRANSMIT PROTOCOL'}
+              </button>
           </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-100 text-center">
+          <div className="mt-8 pt-6 border-t border-white/10 text-center">
             <Link
               to="/signin"
-              className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-gray-800"
+              className="inline-flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-widest text-slate-500 hover:text-white transition-colors cursor-crosshair group/back"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 text-slate-500 group-hover/back:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Back to Sign In
+              Access Terminal
             </Link>
           </div>
         </div>
       </main>
-
-      <footer className="pb-8 text-xs text-gray-400">
-        © 2026 FAF Platform Inc. All rights reserved.
-      </footer>
     </div>
   );
 };
