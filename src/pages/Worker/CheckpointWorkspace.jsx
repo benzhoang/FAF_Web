@@ -166,7 +166,7 @@ const CheckpointWorkspace = () => {
             saveDraft();
             if (sessionRef.current) workSessionsApi.checkOut(checkpointId, notesRef.current).catch(() => {});
         };
-    }, [checkpointId, fetchSessions, loadDraft, saveDraft, toast]);
+    }, [checkpointId, fetchSessions, loadDraft, saveDraft]);
 
     /* Timer tick */
     useEffect(() => {
