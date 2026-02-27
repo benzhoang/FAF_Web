@@ -14,6 +14,14 @@ body {
   min-height: 100vh;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   overflow-x: hidden;
+  /* Increase base font size from default 16px to 18px to scale up all rem-based Tailwind sizes */
+  font-size: 18px;
+}
+
+/* Globally scale up SVGs slightly to match the larger text */
+svg {
+  transform: scale(1.1);
+  transform-origin: center;
 }
 
 @layer utilities {
