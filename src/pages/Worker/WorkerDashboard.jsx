@@ -191,6 +191,33 @@ const WorkerDashboard = () => {
                         <div className="pt-2">
                             {activeTab === 'overview' && (
                                 <div className="space-y-6 animate-[fadeIn_.3s_ease-out]">
+                                    {/* Active Mission */}
+                                    {activeContract && (
+                                        <div className="rounded-2xl border p-6 mb-6 relative overflow-hidden" style={{ background: 'linear-gradient(145deg,#082f49,#0f172a)', borderColor: 'rgba(34,211,238,0.4)' }}>
+                                            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                                                <svg className="w-32 h-32 text-cyan-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.8l7.2 14.2H4.8L12 5.8z"/></svg>
+                                            </div>
+                                            <div className="relative z-10">
+                                                <SectionLabel>CURRENT ENGAGEMENT</SectionLabel>
+                                                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4">
+                                                    <div>
+                                                        <h3 className="text-xl font-black text-white uppercase tracking-wider">{activeContract.job_title}</h3>
+                                                        <p className="text-[12px] font-mono text-cyan-400 mt-1 uppercase tracking-widest">{activeContract.client_name || 'UNKNOWN CLIENT'}</p>
+                                                    </div>
+                                                    <div className="flex flex-col md:items-end gap-2">
+                                                        <span className="inline-block px-3 py-1 rounded text-[10px] font-black font-mono tracking-widest uppercase bg-cyan-900/40 text-cyan-400 border border-cyan-500/50 ring-1 ring-cyan-400/20 blur-[0.3px]">ACTIVE STATUS</span>
+                                                        <p className="text-lg font-black text-emerald-400 font-mono">${Number(activeContract.total_amount || 0).toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="mt-6">
+                                                    <button onClick={() => navigate(`/contract/${activeContract.id}/view`)} className="w-full sm:w-auto px-6 py-2.5 text-[10px] font-black font-mono tracking-widest uppercase bg-cyan-500 hover:bg-cyan-400 text-[#020617] transition-colors rounded shadow-[0_0_15px_rgba(6,182,212,0.4)]">
+                                                        ACCESS WORKSPACE
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     {/* Stats Grid */}
                                     {!contractLoading && (
                                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -280,12 +307,12 @@ const WorkerDashboard = () => {
                                     <div className="rounded-2xl border p-6" style={{ background: 'linear-gradient(145deg,#0d1224,#0f172a)', borderColor: 'rgba(6,182,212,0.2)' }}>
                                         <SectionLabel>TRANSACTION LOGS & CONTRACTS</SectionLabel>
                                         
-                                        {/* Pass them to JobTable component (ensure JobTable itself is somewhat dark-themed or will be restyled separately later) */}
+                                        {/* Pass them to JobTable component */}
                                         <div className="mt-4 cyberpunk-datatable-wrapper">
                                             {contractLoading ? (
                                                 <div className="py-10 text-center text-cyan-500 font-mono text-[10px] tracking-widest uppercase animate-pulse">Decrypting Contracts...</div>
                                             ) : (
-                                                <JobTable />
+                                                <JobTable contracts={allContracts} />
                                             )}
                                         </div>
                                     </div>

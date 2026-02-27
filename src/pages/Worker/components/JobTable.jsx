@@ -23,20 +23,26 @@ const JobTable = ({ contracts = [] }) => {
     return (
         <div className="rounded-xl border border-slate-700/50 bg-[#090e17] overflow-hidden">
             {/* Tabs */}
-            <div className="flex border-b border-slate-700/50 px-4 pt-2 overflow-x-auto no-scrollbar">
-                {['ALL', 'ACTIVE', 'COMPLETED', 'CANCELLED'].map(tab => (
-                    <button
-                        key={tab}
-                        onClick={() => setFilter(tab)}
-                        className={`whitespace-nowrap px-4 py-3 text-[10px] font-black font-mono tracking-widest uppercase border-b-2 transition-all ${
-                            filter === tab 
-                            ? 'border-cyan-400 text-cyan-400' 
-                            : 'border-transparent text-slate-500 hover:text-slate-300'
-                        }`}
-                    >
-                        {tab === 'ALL' ? 'ALL LOGS' : tab}
-                    </button>
-                ))}
+            <div className="flex border-b border-slate-700/50 bg-slate-900/40 overflow-x-auto no-scrollbar">
+                {['ALL', 'ACTIVE', 'COMPLETED', 'CANCELLED'].map(tab => {
+                    let label = tab;
+                    if (tab === 'ALL') label = 'ALL LOGS';
+                    if (tab === 'COMPLETED') label = 'COMPLETED (HISTORY)';
+                    if (tab === 'CANCELLED') label = 'TERMINATED';
+                    return (
+                        <button
+                            key={tab}
+                            onClick={() => setFilter(tab)}
+                            className={`whitespace-nowrap px-6 py-4 text-[10px] font-black font-mono tracking-widest uppercase border-b-2 transition-all ${
+                                filter === tab 
+                                ? 'border-cyan-400 text-cyan-400 bg-cyan-950/40' 
+                                : 'border-transparent text-slate-500 hover:text-slate-300 hover:bg-slate-800/40'
+                            }`}
+                        >
+                            {label}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Table */}
