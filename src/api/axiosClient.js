@@ -28,16 +28,18 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    // Handle 401 - Unauthorized (token expired or invalid)
-    if (error.response?.status === 401) {
+    const requestUrl = error.config?.url || '';
+    const isAuthEndpoint = requestUrl.includes('/auth/login') || requestUrl.includes('/auth/register');
+
+    // Handle 401 - Unauthorized: only redirect if NOT an auth endpoint
+    // (auth endpoints return 401 for wrong password - should show error in UI, not redirect)
+    if (error.response?.status === 401 && !isAuthEndpoint) {
       localStorage.removeItem("accessToken");
       window.location.href = "/signin";
     }
     
     // Handle 403 - Forbidden (no permission)
-    if (error.response?.status === 403) {
-      window.location.href = "/forbidden";
-    }
+    // Removed global redirect to /forbidden to allow custom handling in components
     
     return Promise.reject(error);
   }
