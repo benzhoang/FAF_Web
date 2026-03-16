@@ -191,7 +191,8 @@ const TaskOwnerPage = () => {
               
               <div className="space-y-3">
                 {jobs.map((job) => (
-                  <div key={job.id} className="group p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] border-l-2 hover:border-l-cyan-500 transition-all flex items-center justify-between">
+                  <div key={job.id} className={`group p-4 rounded-xl border border-white/5 bg-white/[0.02] hover:bg-white/[0.04] border-l-2 ${job.status === 'DISPUTED' ? 'border-l-rose-500 animate-pulse bg-rose-500/5' : 'hover:border-l-cyan-500'} transition-all flex items-center justify-between`}>
+
                     <div className="flex items-center gap-4 min-w-0">
                       <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-cyan-400 transition-colors shrink-0">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -236,10 +237,14 @@ const TaskOwnerPage = () => {
                         </div>
                       </div>
                       <span className={`px-3 py-1 rounded text-[9px] font-black font-mono tracking-widest uppercase ${
-                        contract.status === 'ACTIVE' ? 'bg-cyan-900/30 text-cyan-400 border border-cyan-500/30' : 'bg-slate-800 text-slate-400 border border-slate-700'
+                        contract.status === 'ACTIVE' ? 'bg-cyan-900/30 text-cyan-400 border border-cyan-500/30' : 
+                        contract.status === 'DISPUTED' ? 'bg-rose-900/30 text-rose-400 border border-rose-500/50 animate-pulse' :
+                        'bg-slate-800 text-slate-400 border border-slate-700'
                       }`}>
-                        {contract.status === 'ACTIVE' ? t('task_owner.in_progress_status') : contract.status}
+                        {contract.status === 'ACTIVE' ? t('task_owner.in_progress_status') : 
+                         contract.status === 'DISPUTED' ? 'ĐANG TRANH CHẤP' : contract.status}
                       </span>
+
                     </div>
 
                     <div className="space-y-2">

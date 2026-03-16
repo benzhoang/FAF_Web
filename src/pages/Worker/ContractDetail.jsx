@@ -4,6 +4,8 @@ import { useToast } from '../../contexts/ToastContext';
 import { contractsApi } from '../../api/contracts.api';
 import { reviewsApi } from '../../api/reviews.api';
 import ReviewsList from './components/ReviewsList';
+import axiosClient from '../../api/axiosClient';
+
 
 const ContractDetail = () => {
     const { id } = useParams();
@@ -12,6 +14,10 @@ const ContractDetail = () => {
     const [contract, setContract] = useState(null);
     const [loading, setLoading] = useState(true);
     const [reviewsData, setReviewsData] = useState({ reviews: [], summary: null });
+    const [disputeModal, setDisputeModal] = useState({ open: false, checkpointId: null });
+    const [disputeReason, setDisputeReason] = useState('');
+    const [submittingDispute, setSubmittingDispute] = useState(false);
+
 
     useEffect(() => {
         fetchContractDetails();
@@ -128,6 +134,30 @@ const ContractDetail = () => {
     const completedCheckpoints = contract.checkpoints?.filter(cp => cp.status === 'APPROVED').length || 0;
     const progress = totalCheckpoints > 0 ? (completedCheckpoints / totalCheckpoints) * 100 : 0;
 
+    const handleSubmitDispute = async () => {
+        if (!disputeReason.trim()) {
+            toast.error('Vui lòng nhập lý do khiếu nại.');
+            return;
+        }
+        try {
+            setSubmittingDispute(true);
+            await axiosClient.post('/disputes', {
+                contractId: contract.id,
+                checkpointId: disputeModal.checkpointId,
+                reason: disputeReason.trim()
+            });
+            toast.success('Khiếu nại đã được gửi! Manager sẽ xem xét và phản hồi sớm.');
+            setDisputeModal({ open: false, checkpointId: null });
+            setDisputeReason('');
+            fetchContractDetails(); // refresh to show DISPUTED status
+        } catch (err) {
+            toast.error(err?.response?.data?.message || 'Không thể gửi khiếu nại. Vui lòng thử lại.');
+        } finally {
+            setSubmittingDispute(false);
+        }
+    };
+
+
     return (
         <div className="min-h-screen bg-transparent text-slate-300 relative font-sans">
 
@@ -164,9 +194,26 @@ const ContractDetail = () => {
                                         contract.status === 'CANCELLED' || contract.status === 'TERMINATED' ? 'bg-rose-400 shadow-[0_0_5px_rgba(244,63,94,1)]' :
                                         'bg-slate-500'
                                     }`}></div>
-                                    {contract.status}
+                                    {contract.status === 'DISPUTED' ? 'TRANH CHẤP' : contract.status}
                                 </span>
                             </div>
+                            
+                            {/* DISPUTE STATUS ACTION */}
+                            {contract.status === 'DISPUTED' && (
+                                <div className="mb-8 p-5 bg-rose-900/20 border-l-4 border-rose-500 rounded-lg flex items-center justify-between shadow-[0_0_15px_rgba(244,63,94,0.1)]">
+                                    <div>
+                                        <h3 className="text-rose-400 font-bold font-mono tracking-widest text-sm mb-1 uppercase">Đang Tranh Chấp (Disputed)</h3>
+                                        <p className="text-slate-300 text-xs">Hợp đồng này đang trong quá trình khiếu nại. Manager đang xem xét bằng chứng từ 2 bên.</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => navigate(`/disputes/search?contractId=${contract.id}`)}
+                                        className="shrink-0 px-6 py-2.5 bg-rose-500 hover:bg-rose-400 text-white font-black text-xs font-mono tracking-widest uppercase rounded shadow-[0_0_15px_rgba(244,63,94,0.3)] transition-all"
+                                    >
+                                        Vào Phòng Chat Khiếu Nại
+                                    </button>
+                                </div>
+                            )}
+
                             <p className="text-sm text-slate-400 mb-8 leading-relaxed max-w-4xl">{contract.job_description}</p>
                             
                             {/* PENDING SIGNATURE ACTION */}
@@ -329,7 +376,16 @@ const ContractDetail = () => {
                                                 <span className={`inline-flex items-center gap-1.5 mt-2 px-2.5 py-1 rounded text-[9px] font-black font-mono tracking-widest uppercase border ${getStatusColor(checkpoint.status)}`}>
                                                     {checkpoint.status}
                                                 </span>
+                                                {checkpoint.status === 'DISPUTED' && (
+                                                    <button 
+                                                        onClick={() => navigate(`/disputes/search?contractId=${contract.id}`)}
+                                                        className="block mt-3 px-3 py-1 bg-rose-500 hover:bg-rose-400 text-white font-black text-[9px] font-mono tracking-widest uppercase rounded shadow-[0_0_10px_rgba(244,63,94,0.3)] transition-all ml-auto"
+                                                    >
+                                                        Giải quyết tranh chấp
+                                                    </button>
+                                                )}
                                             </div>
+
                                         </div>
 
                                         {checkpoint.due_date && (

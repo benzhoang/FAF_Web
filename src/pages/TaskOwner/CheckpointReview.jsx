@@ -337,6 +337,8 @@ const CheckpointReview = () => {
                                     const isSubmitted = checkpoint.status === 'SUBMITTED';
                                     const isApproved = checkpoint.status === 'APPROVED';
                                     const isRejected = checkpoint.status === 'REJECTED';
+                                    const isDisputed = checkpoint.status === 'DISPUTED';
+
                                     
                                     return (
                                         <div 
@@ -345,7 +347,9 @@ const CheckpointReview = () => {
                                                 isApproved ? 'border-green-200 dark:border-green-900/50 bg-green-50/30 dark:bg-green-900/20' :
                                                 isSubmitted ? 'border-yellow-200 dark:border-yellow-900/50 bg-yellow-50/30 dark:bg-yellow-900/20 shadow-md' :
                                                 isRejected ? 'border-red-200 dark:border-red-900/50 bg-red-50/30 dark:bg-red-900/20' :
+                                                isDisputed ? 'border-rose-300 dark:border-rose-800 bg-rose-50 dark:bg-rose-900/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]' :
                                                 'border-gray-200 dark:border-slate-700 bg-gray-50/30 dark:bg-slate-700/30'
+
                                             }`}
                                         >
                                             <div className="flex justify-between items-start mb-4">
@@ -361,12 +365,14 @@ const CheckpointReview = () => {
                                                             isApproved ? 'text-green-600' :
                                                             isSubmitted ? 'text-yellow-600' :
                                                             isRejected ? 'text-red-600' :
+                                                            isDisputed ? 'text-rose-600' :
                                                             'text-gray-500'
                                                         }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             {isApproved && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />}
                                                             {isSubmitted && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />}
                                                             {isRejected && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />}
-                                                            {!isApproved && !isSubmitted && !isRejected && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
+                                                            {isDisputed && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />}
+                                                            {!isApproved && !isSubmitted && !isRejected && !isDisputed && <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
                                                         </svg>
                                                     </div>
                                                     
@@ -393,10 +399,24 @@ const CheckpointReview = () => {
                                                         isApproved ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' :
                                                         isSubmitted ? 'bg-yellow-100 dark:bg-yellow-900 text-yellow-700 dark:text-yellow-300' :
                                                         isRejected ? 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300' :
+                                                        isDisputed ? 'bg-rose-100 dark:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800' :
                                                         'bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-300'
                                                     }`}>
-                                                        {checkpoint.status}
+                                                        {checkpoint.status === 'DISPUTED' ? 'TRANH CHẤP' : checkpoint.status}
                                                     </span>
+                                                    {isDisputed && (
+                                                        <button 
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/disputes/search?contractId=${contract.id}`);
+                                                            }}
+                                                            className="block mt-3 px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-[10px] rounded shadow-sm transition-colors ml-auto flex items-center gap-1.5"
+                                                        >
+                                                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg>
+                                                            View Dispute Chat
+                                                        </button>
+                                                    )}
+
                                                     {isSubmitted && checkpoint.updated_at && (
                                                         <div className="mt-4 p-2.5 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800/50 rounded-lg text-right max-w-[200px] ml-auto animate-pulse">
                                                             <p className="text-xs font-bold text-red-600 dark:text-red-400 mb-1">
