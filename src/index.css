@@ -1,0 +1,369 @@
+@import "tailwindcss";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: clip;
+  /* Reverted to 16px to fix chaotic layout */
+  font-size: 16px;
+}
+
+/* Globally scale up SVGs slightly to match the larger text */
+svg {
+  transform: scale(1.25);
+  transform-origin: center;
+}
+
+@layer utilities {
+  .auth-gradient {
+    background-image: linear-gradient(135deg,
+        #cce4ff 0%,
+        #e3f0ff 30%,
+        #f9fbff 60%,
+        #d8ecff 100%);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scan {
+  0% {
+    top: -5%;
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 105%;
+    opacity: 0;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* --- Tiptap (Contract editor) minimal content styling --- */
+.tiptap-content h2 {
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 16px;
+}
+
+.tiptap-content h3 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 12px 0 6px;
+}
+
+.tiptap-content p {
+  margin: 0 0 10px;
+}
+
+.tiptap-content ul,
+.tiptap-content ol {
+  padding-left: 1.25rem;
+  margin: 0 0 10px;
+}
+
+.tiptap-content ul {
+  list-style: disc;
+}
+
+.tiptap-content ol {
+  list-style: decimal;
+}
+
+.tiptap-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.tiptap-content img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(229, 231, 235, 1);
+  margin: 10px 0;
+}
+
+/* Custom Scrollbar for dark themes */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(71, 85, 105, 0.5);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(148, 163, 184, 0.8);
+}
+
+/* Drop-in animation for Navbar dropdowns */
+@keyframes dropIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Hide native scrollbar in stories strip */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Modal pop animation */
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Animated gradient shift for sidebar cover */
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Shimmer line sweep */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ─── CSS Variables: Dark (default) ─── */
+:root,
+html[data-theme="dark"] {
+  --bg-base: #020617;
+  --bg-surface: rgba(9, 14, 23, 0.8);
+  --bg-card: rgba(2, 4, 10, 0.9);
+  --border-subtle: rgba(71, 85, 105, 0.25);
+  --border-glow: rgba(6, 182, 212, 0.2);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+  --navbar-bg: rgba(2, 6, 23, 0.95);
+  --scrollbar: rgba(71, 85, 105, 0.5);
+}
+
+/* ─── CSS Variables: Light ─── */
+html[data-theme="light"] {
+  --bg-base: #f0f4f8;
+  --bg-surface: rgba(255, 255, 255, 0.9);
+  --bg-card: rgba(248, 250, 252, 0.95);
+  --border-subtle: rgba(148, 163, 184, 0.4);
+  --border-glow: rgba(6, 182, 212, 0.3);
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --navbar-bg: rgba(240, 244, 248, 0.95);
+  --scrollbar: rgba(148, 163, 184, 0.5);
+
+  /* Override dark hardcoded backgrounds to light equivalents */
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* ─── Light Mode: Override component backgrounds ─── */
+html[data-theme="light"] .bg-\[\#020617\],
+html[data-theme="light"] .bg-\[\#02040a\],
+html[data-theme="light"] .bg-\[\#030014\],
+html[data-theme="light"] .bg-\[\#090e17\]\/80,
+html[data-theme="light"] .bg-\[\#090e17\]\/90 {
+  background-color: var(--bg-surface) !important;
+}
+
+html[data-theme="light"] nav {
+  background: var(--navbar-bg) !important;
+  border-bottom-color: rgba(6, 182, 212, 0.2) !important;
+}
+
+html[data-theme="light"] .text-slate-300,
+html[data-theme="light"] .text-slate-200 {
+  color: var(--text-secondary) !important;
+}
+
+html[data-theme="light"] .text-slate-400,
+html[data-theme="light"] .text-slate-500 {
+  color: var(--text-muted) !important;
+}
+
+html[data-theme="light"] .text-white {
+  color: var(--text-primary) !important;
+}
+
+html[data-theme="light"] .border-slate-700,
+html[data-theme="light"] .border-slate-800 {
+  border-color: var(--border-subtle) !important;
+}
+
+/* Light mode: hide dark matrix/dynamic background canvas, show cleaner bg */
+html[data-theme="light"] canvas {
+  opacity: 0.03 !important;
+}
+
+html[data-theme="light"] .fixed.inset-0.z-\[-1\] {
+  background: linear-gradient(135deg, #e8f4fd 0%, #f0f4f8 40%, #e2edf8 100%) !important;
+}
+
+/* Keep cyberpunk accent colors (cyan, purple, rose) in light mode */
+html[data-theme="light"] .text-cyan-400 {
+  color: #0891b2 !important;
+}
+
+html[data-theme="light"] .text-cyan-500 {
+  color: #0891b2 !important;
+}
+
+html[data-theme="light"] .text-purple-400 {
+  color: #7c3aed !important;
+}
+
+/* Light mode sidebar */
+html[data-theme="light"] aside,
+html[data-theme="light"] [class*="sidebar"] {
+  background-color: rgba(248, 250, 252, 0.95) !important;
+  border-color: rgba(148, 163, 184, 0.3) !important;
+}
+
+/* ─── PRINT CSS: FOR CV EXPORT (A4 Size) ─── */
+@media print {
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+
+  /* Reset Backgrounds & Fonts for Print Clarity */
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  /* Hide UI elements */
+  nav,
+  button,
+  .sidebar,
+  footer,
+  .hidden-print {
+    display: none !important;
+  }
+
+  /* Ensure containers use full width */
+  .max-w-5xl {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  /* CyberCard overrides for clean print */
+  .bg-\[\#090e17\]\/80,
+  .bg-\[\#02040a\],
+  .bg-slate-900\/50,
+  .rounded-2xl,
+  .border,
+  [class*="shadow"] {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #000000 !important;
+  }
+
+  /* Override dark text to black */
+  .text-white,
+  .text-slate-200,
+  .text-slate-300 {
+    color: #000000 !important;
+    font-weight: bold;
+  }
+
+  .text-slate-400,
+  .text-slate-500 {
+    color: #333333 !important;
+  }
+
+  /* Keep cyber colors slightly darker for contrast on white paper */
+  .text-cyan-400 {
+    color: #0891b2 !important;
+  }
+
+  .text-emerald-400 {
+    color: #059669 !important;
+  }
+
+  .text-amber-400 {
+    color: #d97706 !important;
+  }
+
+  .text-purple-400 {
+    color: #7c3aed !important;
+  }
+
+  /* Break logic */
+  .group {
+    page-break-inside: avoid;
+  }
+}
